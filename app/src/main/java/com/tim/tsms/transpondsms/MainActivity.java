@@ -13,8 +13,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 
 import com.tim.tsms.transpondsms.BroadCastReceiver.TSMSBroadcastReceiver;
@@ -25,22 +28,42 @@ import com.tim.tsms.transpondsms.utils.aUtil;
 import com.umeng.analytics.MobclickAgent;
 import com.vector.update_app.UpdateAppManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private IntentFilter intentFilter;
     private TSMSBroadcastReceiver smsBroadcastReceiver;
-    private TextView textv_msg;
     private String TAG = "MainActivity";
+    // tlogList用于存储数据
+    private List<TLog> tLogs=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG,"oncreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        textv_msg=(TextView) findViewById(R.id.textv_msg);
+        // 先拿到数据并放在适配器上
+        initTLogs(); //初始化数据
+        TLogAdapter adapter=new TLogAdapter(MainActivity.this,R.layout.tlog_item,tLogs);
 
-        textv_msg.setMovementMethod(ScrollingMovementMethod.getInstance());
-        textv_msg.setText(SendHistory.getHistory());
+        // 将适配器上的数据传递给listView
+        ListView listView=findViewById(R.id.list_view);
+        listView.setAdapter(adapter);
+
+        // 为ListView注册一个监听器，当用户点击了ListView中的任何一个子项时，就会回调onItemClick()方法
+        // 在这个方法中可以通过position参数判断出用户点击的是那一个子项
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TLog tlog=tLogs.get(position);
+                Toast.makeText(MainActivity.this,tlog.getName(),Toast.LENGTH_SHORT).show();
+            }
+        });
+
+//        textv_msg.setMovementMethod(ScrollingMovementMethod.getInstance());
+//        textv_msg.setText(SendHistory.getHistory());
 
         checkPermission();
 
@@ -51,7 +74,19 @@ public class MainActivity extends AppCompatActivity {
 //        //动态注册广播
 //        registerReceiver(smsBroadcastReceiver, intentFilter);
     }
-
+    // 初始化数据
+    private void initTLogs(){
+        for(int i=0;i<10;i++){
+            TLog a=new TLog("a",R.drawable.ic_launcher_background);
+            tLogs.add(a);
+            TLog b=new TLog("B",R.drawable.ic_launcher_background);
+            tLogs.add(b);
+            TLog c=new TLog("C",R.drawable.ic_launcher_background);
+            tLogs.add(c);
+            TLog d=new TLog("D",R.drawable.ic_launcher_background);
+            tLogs.add(d);
+        }
+    }
     @Override
     protected void onDestroy() {
         Log.d(TAG,"onDestroy");
@@ -81,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     public void showMsg(View view){
         Log.d(TAG,"showMsg");
         String showMsg =SendHistory.getHistory();
-        textv_msg.setText(showMsg);
+//        textv_msg.setText(showMsg);
     }
     
     //按返回键不退出回到桌面
