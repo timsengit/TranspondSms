@@ -1,10 +1,10 @@
 package com.tim.tsms.transpondsms;
 
-public class TLog {
+public class LogModel {
     private String name;
     private int imageId;
 
-    public TLog(String name, int imageId){
+    public LogModel(String name, int imageId){
         this.name=name;
         this.imageId=imageId;
     }

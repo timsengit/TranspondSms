@@ -7,20 +7,18 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.tim.tsms.transpondsms.BroadCastReceiver.TSMSBroadcastReceiver;
+import com.tim.tsms.transpondsms.adapter.LogAdapter;
 import com.tim.tsms.transpondsms.utils.SendHistory;
 import com.tim.tsms.transpondsms.utils.SendUtil;
 import com.tim.tsms.transpondsms.utils.UpdateAppHttpUtil;
@@ -36,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private IntentFilter intentFilter;
     private TSMSBroadcastReceiver smsBroadcastReceiver;
     private String TAG = "MainActivity";
-    // tlogList用于存储数据
-    private List<TLog> tLogs=new ArrayList<>();
+    // logModelList用于存储数据
+    private List<LogModel> logModels =new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +44,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         // 先拿到数据并放在适配器上
         initTLogs(); //初始化数据
-        TLogAdapter adapter=new TLogAdapter(MainActivity.this,R.layout.tlog_item,tLogs);
+        LogAdapter adapter=new LogAdapter(MainActivity.this,R.layout.tlog_item, logModels);
 
         // 将适配器上的数据传递给listView
-        ListView listView=findViewById(R.id.list_view);
+        ListView listView=findViewById(R.id.list_view_log);
         listView.setAdapter(adapter);
 
         // 为ListView注册一个监听器，当用户点击了ListView中的任何一个子项时，就会回调onItemClick()方法
@@ -57,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TLog tlog=tLogs.get(position);
-                Toast.makeText(MainActivity.this,tlog.getName(),Toast.LENGTH_SHORT).show();
+                LogModel logModel= logModels.get(position);
+                Toast.makeText(MainActivity.this,logModel.getName(),Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -77,14 +75,14 @@ public class MainActivity extends AppCompatActivity {
     // 初始化数据
     private void initTLogs(){
         for(int i=0;i<10;i++){
-            TLog a=new TLog("a",R.drawable.ic_launcher_background);
-            tLogs.add(a);
-            TLog b=new TLog("B",R.drawable.ic_launcher_background);
-            tLogs.add(b);
-            TLog c=new TLog("C",R.drawable.ic_launcher_background);
-            tLogs.add(c);
-            TLog d=new TLog("D",R.drawable.ic_launcher_background);
-            tLogs.add(d);
+            LogModel a=new LogModel("a",R.drawable.ic_launcher_background);
+            logModels.add(a);
+            LogModel b=new LogModel("B",R.drawable.ic_launcher_background);
+            logModels.add(b);
+            LogModel c=new LogModel("C",R.drawable.ic_launcher_background);
+            logModels.add(c);
+            LogModel d=new LogModel("D",R.drawable.ic_launcher_background);
+            logModels.add(d);
         }
     }
     @Override
@@ -108,8 +106,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     public void toSetting(){
         Intent intent = new Intent(this, SettingActivity.class);
+        startActivity(intent);
+    }
+
+    public void toRuleSetting(View view){
+        Intent intent = new Intent(this, RuleActivity.class);
+        startActivity(intent);
+    }
+
+    public void toSendSetting(View view){
+        Intent intent = new Intent(this, SenderActivity.class);
         startActivity(intent);
     }
 

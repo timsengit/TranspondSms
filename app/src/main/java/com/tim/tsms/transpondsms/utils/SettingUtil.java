@@ -65,8 +65,4 @@ public class SettingUtil {
     public static boolean saveMsgHistory(){
         return sp_setting.getBoolean("option_save_history_on",false);
     }
-    public static int getMsgHistoryCount(){
-        return Integer.valueOf(sp_setting.getString("option_save_history_num","100"));
-    }
-
 }

@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <ListView
-        android:id="@+id/list_view_log"
+        android:id="@+id/list_view_rule"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1" />
@@ -19,42 +19,22 @@
         >
 
         <Button
-            android:id="@+id/bt_refresh_log"
+            android:id="@+id/button22"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:layout_margin="10px"
             android:background="@android:color/holo_blue_dark"
             android:onClick="showMsg"
-            android:text="刷新记录"
+            android:text="显示历史"
             tools:ignore="NestedWeights" />
         <Button
-            android:id="@+id/bt_send_test"
+            android:id="@+id/button12"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/holo_blue_dark"
             android:onClick="sendMsg"
             android:text="发送测试"
-            android:layout_weight="1"
-            android:layout_margin="10px"
-            />
-        <Button
-            android:id="@+id/bt_rule_set"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_margin="10px"
-            android:background="@android:color/holo_blue_dark"
-            android:onClick="toRuleSetting"
-            android:text="设置转发规则"
-            tools:ignore="NestedWeights" />
-        <Button
-            android:id="@+id/bt_send_set"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/holo_blue_dark"
-            android:onClick="toSendSetting"
-            android:text="设置发送方"
             android:layout_weight="1"
             android:layout_margin="10px"
             />

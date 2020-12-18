@@ -55,13 +55,6 @@
             android:summaryOff="不保存转发记录"
             android:summaryOn="保存转发记录"
             android:title="保存转发记录" />
-        <EditTextPreference
-            android:dependency="option_save_history_on"
-            android:key="option_save_history_num"
-            android:inputType="number"
-            android:hint="100"
-            android:summary="保存转发历史条数"
-            android:title="设置保存转发历史条数" />
 
     </PreferenceCategory>
 

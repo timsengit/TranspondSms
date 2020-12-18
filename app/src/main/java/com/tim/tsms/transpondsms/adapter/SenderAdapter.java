@@ -1,4 +1,4 @@
-package com.tim.tsms.transpondsms;
+package com.tim.tsms.transpondsms.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,13 +8,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.tim.tsms.transpondsms.R;
+import com.tim.tsms.transpondsms.model.SenderModel;
+
 import java.util.List;
 
-public class TLogAdapter extends ArrayAdapter<TLog> {
+public class SenderAdapter extends ArrayAdapter<SenderModel> {
     private int resourceId;
 
     // 适配器的构造函数，把要适配的数据传入这里
-    public TLogAdapter(Context context, int textViewResourceId, List<TLog> objects){
+    public SenderAdapter(Context context, int textViewResourceId, List<SenderModel> objects){
         super(context,textViewResourceId,objects);
         resourceId=textViewResourceId;
     }
@@ -22,7 +25,7 @@ public class TLogAdapter extends ArrayAdapter<TLog> {
     // convertView 参数用于将之前加载好的布局进行缓存
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
-        TLog tLog=getItem(position); //获取当前项的TLog实例
+        SenderModel senderModel=getItem(position); //获取当前项的TLog实例
 
         // 加个判断，以免ListView每次滚动时都要重新加载布局，以提高运行效率
         View view;
@@ -34,8 +37,8 @@ public class TLogAdapter extends ArrayAdapter<TLog> {
 
             // 避免每次调用getView()时都要重新获取控件实例
             viewHolder=new ViewHolder();
-            viewHolder.tLogImage=view.findViewById(R.id.tlog_image);
-            viewHolder.tLogName=view.findViewById(R.id.tlog_name);
+            viewHolder.senderImage =view.findViewById(R.id.sender_image);
+            viewHolder.senderName =view.findViewById(R.id.sender_name);
 
             // 将ViewHolder存储在View中（即将控件的实例存储在其中）
             view.setTag(viewHolder);
@@ -45,14 +48,14 @@ public class TLogAdapter extends ArrayAdapter<TLog> {
         }
 
         // 获取控件实例，并调用set...方法使其显示出来
-        viewHolder.tLogImage.setImageResource(tLog.getImageId());
-        viewHolder.tLogName.setText(tLog.getName());
+        viewHolder.senderImage.setImageResource(senderModel.getImageId());
+        viewHolder.senderName.setText(senderModel.getName());
         return view;
     }
 
     // 定义一个内部类，用于对控件的实例进行缓存
     class ViewHolder{
-        ImageView tLogImage;
-        TextView tLogName;
+        ImageView senderImage;
+        TextView senderName;
     }
 }
