@@ -16,8 +16,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class SendHistory {
-    static String TAG = "SendHistory";
+public class LogUtil {
+    static String TAG = "LogUtil";
     static Context context;
     static DbHelperTLog dbHelper;
     static SQLiteDatabase db;
@@ -26,36 +26,9 @@ public class SendHistory {
         context = context1;
         dbHelper = new DbHelperTLog(context);
         db = dbHelper.getReadableDatabase();
-
     }
 
-    public static void addHistory(String msg) {
-        //不保存转发消息
-        if (!SettingUtil.saveMsgHistory()) return;
-        //保存
-        SharedPreferences sp = context.getSharedPreferences(Define.SP_MSG, Context.MODE_PRIVATE);
-        Set<String> msg_set_default = new HashSet<>();
-        Set<String> msg_set;
-        msg_set = sp.getStringSet(Define.SP_MSG_SET_KEY, msg_set_default);
-        Log.d(TAG, "msg_set：" + msg_set.toString());
-        Log.d(TAG, "msg_set：" + Integer.toString(msg_set.size()));
-        msg_set.add(msg);
-        sp.edit().putStringSet(Define.SP_MSG_SET_KEY, msg_set).apply();
-    }
-
-    public static String getHistory() {
-        SharedPreferences sp = context.getSharedPreferences(Define.SP_MSG, Context.MODE_PRIVATE);
-        Set<String> msg_set = new HashSet<>();
-        msg_set = sp.getStringSet(Define.SP_MSG_SET_KEY, msg_set);
-        Log.d(TAG, "msg_set.toString()" + msg_set.toString());
-        String getMsg = "";
-        for (String str : msg_set) {
-            getMsg += str + "\n";
-        }
-        return getMsg;
-    }
-
-    public static long addHistoryDb(LogModel logModel) {
+    public static long addLog(LogModel logModel) {
         //不保存转发消息
         if (!SettingUtil.saveMsgHistory()) return 0;
 
@@ -73,7 +46,7 @@ public class SendHistory {
         return db.insert(LogTable.LogEntry.TABLE_NAME, null, values);
     }
 
-    public static int delHistoryDb(Long id,String key) {
+    public static int delLog(Long id,String key) {
         // Define 'where' part of query.
         String selection = " 1 ";
         // Specify arguments in placeholder order.
@@ -99,7 +72,7 @@ public class SendHistory {
 
     }
 
-    public static String getHistoryDb(Long id,String key) {
+    public static String getLog(Long id,String key) {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
