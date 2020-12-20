@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.tim.tsms.transpondsms.model.LogTable;
-import com.tim.tsms.transpondsms.model.MatchTable;
 import com.tim.tsms.transpondsms.model.RuleTable;
 import com.tim.tsms.transpondsms.model.SenderTable;
 
@@ -26,16 +25,11 @@ public class DbHelper extends SQLiteOpenHelper {
                             LogTable.LogEntry.COLUMN_NAME_FROM + " TEXT," +
                             LogTable.LogEntry.COLUMN_NAME_CONTENT + " TEXT," +
                             LogTable.LogEntry.COLUMN_NAME_TIME + "  TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP)"
-                    , "CREATE TABLE " + MatchTable.MatchEntry.TABLE_NAME + " (" +
-                            MatchTable.MatchEntry._ID + " INTEGER PRIMARY KEY," +
-                            MatchTable.MatchEntry.COLUMN_NAME_NEXT_ID + " INTEGER," +
-                            MatchTable.MatchEntry.COLUMN_NAME_FILED + " TEXT," +
-                            MatchTable.MatchEntry.COLUMN_NAME_CHECK + " TEXT," +
-                            MatchTable.MatchEntry.COLUMN_NAME_VALUE + " TEXT," +
-                            MatchTable.MatchEntry.COLUMN_NAME_TIME + "  TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP)"
                     , "CREATE TABLE " + RuleTable.RuleEntry.TABLE_NAME + " (" +
                             RuleTable.RuleEntry._ID + " INTEGER PRIMARY KEY," +
-                            RuleTable.RuleEntry.COLUMN_NAME_MATCH_ID + " INTEGER," +
+                            RuleTable.RuleEntry.COLUMN_NAME_FILED + " TEXT," +
+                            RuleTable.RuleEntry.COLUMN_NAME_CHECK + " TEXT," +
+                            RuleTable.RuleEntry.COLUMN_NAME_VALUE + " TEXT," +
                             RuleTable.RuleEntry.COLUMN_NAME_SENDER_ID + " INTEGER," +
                             RuleTable.RuleEntry.COLUMN_NAME_TIME + "  TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP)"
                     , "CREATE TABLE " + SenderTable.SenderEntry.TABLE_NAME + " (" +
@@ -51,7 +45,6 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final List<String> SQL_DELETE_ENTRIES =
             Arrays.asList(
                     "DROP TABLE IF EXISTS " + LogTable.LogEntry.TABLE_NAME + " ; "
-                    , "DROP TABLE IF EXISTS " + MatchTable.MatchEntry.TABLE_NAME + " ; "
                     , "DROP TABLE IF EXISTS " + RuleTable.RuleEntry.TABLE_NAME + " ; "
                     , "DROP TABLE IF EXISTS " + SenderTable.SenderEntry.TABLE_NAME + " ; "
 
