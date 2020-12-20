@@ -31,7 +31,4 @@ public class LogModel {
         return time;
     }
 
-    public void setTime(Long time) {
-        this.time = time;
-    }
 }

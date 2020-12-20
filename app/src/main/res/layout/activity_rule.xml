@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
     <ListView
         android:id="@+id/list_view_rule"
         android:layout_width="match_parent"
@@ -28,16 +29,7 @@
             android:onClick="showMsg"
             android:text="显示历史"
             tools:ignore="NestedWeights" />
-        <Button
-            android:id="@+id/button12"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/holo_blue_dark"
-            android:onClick="sendMsg"
-            android:text="发送测试"
-            android:layout_weight="1"
-            android:layout_margin="10px"
-            />
+
     </LinearLayout>
 
 

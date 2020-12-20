@@ -2,32 +2,26 @@ package com.tim.tsms.transpondsms.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
-import android.util.Log;
 
-import com.tim.tsms.transpondsms.model.LogModel;
 import com.tim.tsms.transpondsms.model.RuleTable;
 import com.tim.tsms.transpondsms.model.RuleModel;
-import com.tim.tsms.transpondsms.model.RuleTable;
-import com.tim.tsms.transpondsms.model.RuleVo;
+import com.tim.tsms.transpondsms.model.vo.RuleVo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class RuleUtil {
     static String TAG = "RuleUtil";
     static Context context;
-    static DbHelperTLog dbHelper;
+    static DbHelper dbHelper;
     static SQLiteDatabase db;
 
     public static void init(Context context1) {
         context = context1;
-        dbHelper = new DbHelperTLog(context);
+        dbHelper = new DbHelper(context);
         db = dbHelper.getReadableDatabase();
     }
 
@@ -59,7 +53,7 @@ public class RuleUtil {
 
         }
 
-        String[] selectionArgs = (String[]) selectionArgList.toArray();
+        String[] selectionArgs = selectionArgList.toArray(new String[selectionArgList.size()]);
         // Issue SQL statement.
         return db.delete(RuleTable.RuleEntry.TABLE_NAME, selection, selectionArgs);
 
@@ -99,7 +93,7 @@ public class RuleUtil {
             selectionArgList.add(String.valueOf(senderId));
         }
 
-        String[] selectionArgs = (String[]) selectionArgList.toArray();
+        String[] selectionArgs = selectionArgList.toArray(new String[selectionArgList.size()]);
 
         // How you want the results sorted in the resulting Cursor
         String sortOrder =

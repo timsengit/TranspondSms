@@ -93,18 +93,6 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(smsBroadcastReceiver);
     }
 
-    public void sendMsg(View view){
-        try{
-//            6位数随机数
-//            DingdingMsg.sendMsg(Integer.toString((int) (Math.random()*9+1)*100000));
-            SendUtil.send_msg(Integer.toString((int) (Math.random()*9+1)*100000));
-//            SendMailUtil.send("1547681531@qq.com","s","2");
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-    }
-
 
 
     public void toSetting(){

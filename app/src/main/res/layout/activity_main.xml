@@ -9,6 +9,7 @@
         android:id="@+id/list_view_log"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="8dp"
         android:layout_weight="1" />
 
     <LinearLayout
@@ -23,27 +24,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_margin="10px"
+            android:layout_margin="10dp"
             android:background="@android:color/holo_blue_dark"
             android:onClick="showMsg"
             android:text="刷新记录"
             tools:ignore="NestedWeights" />
         <Button
-            android:id="@+id/bt_send_test"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/holo_blue_dark"
-            android:onClick="sendMsg"
-            android:text="发送测试"
-            android:layout_weight="1"
-            android:layout_margin="10px"
-            />
-        <Button
             android:id="@+id/bt_rule_set"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_margin="10px"
+            android:layout_margin="10dp"
             android:background="@android:color/holo_blue_dark"
             android:onClick="toRuleSetting"
             android:text="设置转发规则"
@@ -56,7 +47,7 @@
             android:onClick="toSendSetting"
             android:text="设置发送方"
             android:layout_weight="1"
-            android:layout_margin="10px"
+            android:layout_margin="10dp"
             />
     </LinearLayout>
 

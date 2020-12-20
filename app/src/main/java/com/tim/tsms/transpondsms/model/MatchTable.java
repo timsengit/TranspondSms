@@ -12,7 +12,7 @@ public final class MatchTable {
         public static final String TABLE_NAME = "match";
         public static final String COLUMN_NAME_NEXT_ID = "next_id";
         public static final String COLUMN_NAME_FILED = "filed";
-        public static final String COLUMN_NAME_CHECK = "check";
+        public static final String COLUMN_NAME_CHECK = "tcheck";
         public static final String COLUMN_NAME_VALUE = "value";
         public static final String COLUMN_NAME_TIME = "time";
     }

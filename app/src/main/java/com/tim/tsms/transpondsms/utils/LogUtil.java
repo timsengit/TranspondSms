@@ -19,12 +19,13 @@ import java.util.Set;
 public class LogUtil {
     static String TAG = "LogUtil";
     static Context context;
-    static DbHelperTLog dbHelper;
+    static DbHelper dbHelper;
     static SQLiteDatabase db;
 
     public static void init(Context context1) {
         context = context1;
-        dbHelper = new DbHelperTLog(context);
+        dbHelper = new DbHelper(context);
+        // Gets the data repository in write mode
         db = dbHelper.getReadableDatabase();
     }
 
@@ -32,14 +33,10 @@ public class LogUtil {
         //不保存转发消息
         if (!SettingUtil.saveMsgHistory()) return 0;
 
-        // Gets the data repository in write mode
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
         values.put(LogTable.LogEntry.COLUMN_NAME_FROM, logModel.getFrom());
         values.put(LogTable.LogEntry.COLUMN_NAME_CONTENT, logModel.getContent());
-        values.put(LogTable.LogEntry.COLUMN_NAME_TIME, logModel.getTime());
 
         // Insert the new row, returning the primary key value of the new row
 
@@ -66,7 +63,7 @@ public class LogUtil {
             selectionArgList.add(key);
             selectionArgList.add(key);
         }
-        String[] selectionArgs = (String[]) selectionArgList.toArray();
+        String[] selectionArgs = selectionArgList.toArray(new String[selectionArgList.size()]);
         // Issue SQL statement.
         return db.delete(LogTable.LogEntry.TABLE_NAME, selection, selectionArgs);
 
@@ -99,7 +96,7 @@ public class LogUtil {
             selectionArgList.add(key);
             selectionArgList.add(key);
         }
-        String[] selectionArgs = (String[]) selectionArgList.toArray();
+        String[] selectionArgs = selectionArgList.toArray(new String[selectionArgList.size()]);
 
         // How you want the results sorted in the resulting Cursor
         String sortOrder =

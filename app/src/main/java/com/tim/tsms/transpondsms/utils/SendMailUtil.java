@@ -1,9 +1,21 @@
 package com.tim.tsms.transpondsms.utils;
 
+import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
-import java.io.File;
-import java.util.StringTokenizer;
+import java.util.Date;
+import java.util.Properties;
+
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+import static com.tim.tsms.transpondsms.SenderActivity.NOTIFY;
 
 
 public class SendMailUtil {
@@ -20,44 +32,94 @@ public class SendMailUtil {
 //    private static final String FROM_ADD = "xxxxxx@163.com";
 //    private static final String FROM_PSW = "xx";
 
-    public static void send(final File file,String toAdd,String title,String content){
-        Log.d(TAG,"send file to "+toAdd);
-        final MailInfo mailInfo = creatMail(toAdd,title,content);
-        final MailSender sms = new MailSender();
+    public static void sendEmail(final boolean handError,final String host, final String port, final String fromemail, final String pwd, final String toAdd, final String title, final String content) {
+
+        Log.d(TAG, "sendEmail: host:"+host+" port:"+port+" fromemail:"+fromemail+" pwd:"+pwd+" toAdd:"+toAdd);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                sms.sendFileMail(mailInfo,file);
+
+                try {
+                    final MailSenderInfo mailInfo = new MailSenderInfo();
+                    mailInfo.setMailServerHost(host);
+                    mailInfo.setMailServerPort(port);
+                    mailInfo.setValidate(true);
+                    mailInfo.setUserName(fromemail);  //你的邮箱地址
+                    mailInfo.setPassword(pwd);//您的邮箱密码
+                    mailInfo.setFromAddress(fromemail);//和上面username的邮箱地址一致
+                    mailInfo.setToAddress(toAdd);
+                    mailInfo.setSubject(title);
+                    mailInfo.setContent(content);
+
+                    //这个类主要来发送邮件
+                    // 判断是否需要身份认证
+                    MyAuthenticator authenticator = null;
+                    Properties pro = mailInfo.getProperties();
+                    if (mailInfo.isValidate()) {
+                        // 如果需要身份认证，则创建一个密码验证器
+                        authenticator = new MyAuthenticator(mailInfo.getUserName(), mailInfo.getPassword());
+                    }
+                    // 根据邮件会话属性和密码验证器构造一个发送邮件的session
+                    Session sendMailSession = Session.getDefaultInstance(pro, authenticator);
+                    try {
+                        // 根据session创建一个邮件消息
+                        final Message mailMessage = new MimeMessage(sendMailSession);
+                        // 创建邮件发送者地址
+                        Address from = new InternetAddress(mailInfo.getFromAddress());
+                        // 设置邮件消息的发送者
+                        mailMessage.setFrom(from);
+                        // 创建邮件的接收者地址，并设置到邮件消息中
+                        Address to = new InternetAddress(mailInfo.getToAddress());
+                        mailMessage.setRecipient(Message.RecipientType.TO, to);
+                        // 设置邮件消息的主题
+                        mailMessage.setSubject(mailInfo.getSubject());
+                        // 设置邮件消息发送的时间
+                        mailMessage.setSentDate(new Date());
+                        // 设置邮件消息的主要内容
+                        String mailContent = mailInfo.getContent();
+                        mailMessage.setText(mailContent);
+                        // 发送邮件
+                        Transport.send(mailMessage);
+
+                    } catch (MessagingException ex) {
+                        ex.printStackTrace();
+                        Log.e(TAG, "error"+ex.getMessage());
+                        if(handError){
+                            android.os.Message msg = new android.os.Message();
+                            msg.what = NOTIFY;
+                            Bundle bundle = new Bundle();
+                            bundle.putString("DATA",ex.getMessage());
+                            msg.setData(bundle);
+                            (new Handler()).sendMessage(msg);
+                        }
+
+
+                    }
+                    if(handError){
+                        android.os.Message msg = new android.os.Message();
+                        msg.what = NOTIFY;
+                        Bundle bundle = new Bundle();
+                        bundle.putString("DATA","发送成功");
+                        msg.setData(bundle);
+                        (new Handler()).sendMessage(msg);
+                    }
+
+                    Log.e(TAG, "sendEmail success");//sms.sendHtmlMail(mailInfo);//发送html格式
+
+                } catch (Exception e) {
+                    Log.e(TAG, e.getMessage(), e);
+                    if(handError){
+                        android.os.Message msg = new android.os.Message();
+                        msg.what = NOTIFY;
+                        Bundle bundle = new Bundle();
+                        bundle.putString("DATA",e.getMessage());
+                        msg.setData(bundle);
+                        (new Handler()).sendMessage(msg);
+                    }
+
+                }
             }
         }).start();
-    }
-
-    public static void send(String toAdd,String title,String content){
-        Log.d(TAG,"send to "+toAdd);
-        final MailInfo mailInfo = creatMail(toAdd,title,content);
-        final MailSender sms = new MailSender();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                sms.sendTextMail(mailInfo);
-            }
-        }).start();
-    }
-
-    private static MailInfo creatMail(String toAdd,String title,String content) {
-        Log.d(TAG,"creatMail to "+toAdd);
-        final MailInfo mailInfo = new MailInfo();
-        mailInfo.setMailServerHost(SettingUtil.get_send_util_email(Define.SP_MSG_SEND_UTIL_EMAIL_HOST_KEY));
-        mailInfo.setMailServerPort(SettingUtil.get_send_util_email(Define.SP_MSG_SEND_UTIL_EMAIL_PORT_KEY));
-        mailInfo.setValidate(true);
-        mailInfo.ssl(true);
-        mailInfo.setUserName(SettingUtil.get_send_util_email(Define.SP_MSG_SEND_UTIL_EMAIL_FROMADD_KEY)); // 你的邮箱地址
-        mailInfo.setPassword(SettingUtil.get_send_util_email(Define.SP_MSG_SEND_UTIL_EMAIL_PSW_KEY));// 您的邮箱密码
-        mailInfo.setFromAddress(SettingUtil.get_send_util_email(Define.SP_MSG_SEND_UTIL_EMAIL_FROMADD_KEY)); // 发送的邮箱
-        mailInfo.setToAddress(SettingUtil.get_send_util_email(Define.SP_MSG_SEND_UTIL_EMAIL_TOADD_KEY)); // 发到哪个邮件去
-        mailInfo.setSubject(title); // 邮件主题
-        mailInfo.setContent(content); // 邮件文本
-        return mailInfo;
     }
 }
 
