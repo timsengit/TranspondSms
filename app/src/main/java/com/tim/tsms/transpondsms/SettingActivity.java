@@ -8,6 +8,7 @@ import android.preference.SwitchPreference;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Switch;
@@ -33,13 +34,13 @@ public class SettingActivity extends AppCompatActivity {
         checkWithReboot(check_with_reboot);
 
         TextView version_now = (TextView)findViewById(R.id.version_now);
-        LinearLayout version = (LinearLayout)findViewById(R.id.version);
+        Button check_version_now = (Button)findViewById(R.id.check_version_now);
         try {
             version_now.setText(aUtil.getVersionName(SettingActivity.this));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        version.setOnClickListener(new View.OnClickListener() {
+        check_version_now.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkNewVersion();
