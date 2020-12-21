@@ -154,35 +154,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkNewVersion(){
-        String geturl = "http://api.allmything.com/api/version/hasnew?versioncode=";
-
-        try {
-            geturl+= aUtil.getVersionCode(MainActivity.this);
-
-            Log.i("SettingActivity",geturl);
-            new UpdateAppManager
-                    .Builder()
-                    //当前Activity
-                    .setActivity(MainActivity.this)
-                    //更新地址
-                    .setUpdateUrl(geturl)
-                    //实现httpManager接口的对象
-                    .setHttpManager(new UpdateAppHttpUtil())
-                    .build()
-                    .update();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.check_new_version:
-                checkNewVersion();
-                return true;
             case R.id.to_setting:
                 toSetting();
                 return true;
