@@ -5,24 +5,43 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.tim.tsms.transpondsms.R;
 import com.tim.tsms.transpondsms.model.RuleModel;
 import com.tim.tsms.transpondsms.model.SenderModel;
+import com.tim.tsms.transpondsms.utils.SenderUtil;
 
 import java.util.List;
 
 public class RuleAdapter extends ArrayAdapter<RuleModel> {
     private int resourceId;
+    private List<RuleModel> list;
 
     // 适配器的构造函数，把要适配的数据传入这里
     public RuleAdapter(Context context, int textViewResourceId, List<RuleModel> objects){
         super(context,textViewResourceId,objects);
         resourceId=textViewResourceId;
+        list=objects;
+    }
+    @Override
+    public int getCount() {
+        return list.size();
     }
 
+    @Override
+    public RuleModel getItem(int position) {
+        return list.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        RuleModel item =list.get(position);
+        if(item==null){
+            return 0;
+        }
+        return item.getId();
+    }
     // convertView 参数用于将之前加载好的布局进行缓存
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
@@ -49,8 +68,18 @@ public class RuleAdapter extends ArrayAdapter<RuleModel> {
         }
 
         // 获取控件实例，并调用set...方法使其显示出来
-        viewHolder.ruleSender.setText(ruleModel.getMatchId()+"");
-        viewHolder.ruleSender.setText(ruleModel.getSenderId()+"");
+        if(ruleModel!=null){
+            List<SenderModel> senderModel = SenderUtil.getSender(ruleModel.getSenderId(),null);
+            viewHolder.ruleMatch.setText(ruleModel.getRuleMatch());
+            if(!senderModel.isEmpty()){
+                viewHolder.ruleSender.setText(senderModel.get(0).getName());
+
+            }else{
+                viewHolder.ruleSender.setText("");
+
+            }
+        }
+
         return view;
     }
 
@@ -59,4 +88,23 @@ public class RuleAdapter extends ArrayAdapter<RuleModel> {
         TextView ruleMatch;
         TextView ruleSender;
     }
+    public void add(List<RuleModel> ruleModels){
+        if(list!=null){
+            list=ruleModels;
+            notifyDataSetChanged();
+        }
+    }
+    public void del(List<RuleModel> ruleModels){
+        if(list!=null){
+            list=ruleModels;
+            notifyDataSetChanged();
+        }
+    }
+    public void update(List<RuleModel> ruleModels){
+        if(list!=null){
+            list=ruleModels;
+            notifyDataSetChanged();
+        }
+    }
+
 }

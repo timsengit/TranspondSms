@@ -15,13 +15,32 @@ import java.util.List;
 
 public class SenderAdapter extends ArrayAdapter<SenderModel> {
     private int resourceId;
+    private List<SenderModel> list;
 
     // 适配器的构造函数，把要适配的数据传入这里
     public SenderAdapter(Context context, int textViewResourceId, List<SenderModel> objects){
         super(context,textViewResourceId,objects);
         resourceId=textViewResourceId;
+        list=objects;
+    }
+    @Override
+    public int getCount() {
+        return list.size();
     }
 
+    @Override
+    public SenderModel getItem(int position) {
+        return list.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        SenderModel item =list.get(position);
+        if(item==null){
+            return 0;
+        }
+        return item.getId();
+    }
     // convertView 参数用于将之前加载好的布局进行缓存
     @Override
     public View getView(int position, View convertView, ViewGroup parent){
@@ -48,8 +67,11 @@ public class SenderAdapter extends ArrayAdapter<SenderModel> {
         }
 
         // 获取控件实例，并调用set...方法使其显示出来
-        viewHolder.senderImage.setImageResource(senderModel.getImageId());
-        viewHolder.senderName.setText(senderModel.getName());
+        if(senderModel!=null){
+            viewHolder.senderImage.setImageResource(senderModel.getImageId());
+            viewHolder.senderName.setText(senderModel.getName());
+        }
+
         return view;
     }
 
@@ -58,4 +80,41 @@ public class SenderAdapter extends ArrayAdapter<SenderModel> {
         ImageView senderImage;
         TextView senderName;
     }
+    public void add(SenderModel senderModel){
+        if(list!=null){
+            list.add(senderModel);
+            notifyDataSetChanged();
+        }
+    }
+    public void del(int position){
+        if(list!=null){
+            list.remove(position);
+            notifyDataSetChanged();
+        }
+    }
+    public void update(SenderModel senderModel,int position){
+        if(list!=null){
+            list.set(position,senderModel);
+            notifyDataSetChanged();
+        }
+    }
+    public void add(List<SenderModel> senderModels){
+        if(list!=null){
+            list=senderModels;
+            notifyDataSetChanged();
+        }
+    }
+    public void del(List<SenderModel> senderModels){
+        if(list!=null){
+            list=senderModels;
+            notifyDataSetChanged();
+        }
+    }
+    public void update(List<SenderModel> senderModels){
+        if(list!=null){
+            list=senderModels;
+            notifyDataSetChanged();
+        }
+    }
+
 }

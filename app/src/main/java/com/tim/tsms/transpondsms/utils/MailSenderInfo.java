@@ -2,31 +2,26 @@ package com.tim.tsms.transpondsms.utils;
 
 import java.util.Properties;
 
-public class MailInfo {
+public class MailSenderInfo {
+    // 发送邮件的服务器的IP和端口
+    private String mailServerHost;
+    private String mailServerPort = "25";
 
-    private String mailServerHost;// 发送邮件的服务器的IP
-    private String mailServerPort;// 发送邮件的服务器的端口
-    private String fromAddress;// 邮件发送者的地址
-    private String toAddress;   // 邮件接收者的地址
-    private String userName;// 登陆邮件发送服务器的用户名
-    private String password;// 登陆邮件发送服务器的密码
-    private boolean validate = true;// 是否需要身份验证
-    private boolean ssl = true;// ssl
-    private String subject;// 邮件主题
-    private String content;// 邮件的文本内容
-    private String[] attachFileNames;// 邮件附件的文件名
-
-
-    public String toString(){
-        return "mailServerHost:"+this.mailServerHost
-                +"mailServerPort:"+this.mailServerPort
-                +"fromAddress:"+this.fromAddress
-                +"toAddress:"+this.toAddress
-                +"userName:"+this.userName
-                +"password:"+this.password
-                +"subject:"+this.subject
-                +"content:"+this.content;
-    }
+    // 邮件发送者的地址
+    private String fromAddress;
+    // 邮件接收者的地址
+    private String toAddress;
+    // 登陆邮件发送服务器的用户名和密码
+    private String userName;
+    private String password;
+    // 是否需要身份验证
+    private boolean validate = true;
+    // 邮件主题
+    private String subject;
+    // 邮件的文本内容
+    private String content;
+    // 邮件附件的文件名
+    private String[] attachFileNames;
 
     /**
      * 获得邮件会话属性
@@ -36,20 +31,6 @@ public class MailInfo {
         p.put("mail.smtp.host", this.mailServerHost);
         p.put("mail.smtp.port", this.mailServerPort);
         p.put("mail.smtp.auth", validate ? "true" : "false");
-
-        // 设置SSL加密(未采用SSL时，端口一般为25，可以不用设置；采用SSL时，端口为465，需要显示设置)
-        if(ssl){
-            p.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            p.put("mail.smtp.socketFactory.fallback", "false");
-            p.put("mail.smtp.socketFactory.port", this.mailServerPort);
-        }
-
-
-
-//        props.setProperty("mail.smtp.port", "465");
-//        props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-//        props.setProperty("mail.smtp.socketFactory.fallback", "false");
-//        props.setProperty("mail.smtp.socketFactory.port", "465");
         return p;
     }
 
@@ -75,10 +56,6 @@ public class MailInfo {
 
     public void setValidate(boolean validate) {
         this.validate = validate;
-    }
-
-    public void ssl(boolean ssl) {
-        this.ssl = ssl;
     }
 
     public String[] getAttachFileNames() {

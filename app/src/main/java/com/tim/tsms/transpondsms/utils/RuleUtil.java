@@ -2,48 +2,57 @@ package com.tim.tsms.transpondsms.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
-import android.util.Log;
 
-import com.tim.tsms.transpondsms.model.LogModel;
-import com.tim.tsms.transpondsms.model.RuleTable;
 import com.tim.tsms.transpondsms.model.RuleModel;
 import com.tim.tsms.transpondsms.model.RuleTable;
-import com.tim.tsms.transpondsms.model.RuleVo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class RuleUtil {
     static String TAG = "RuleUtil";
     static Context context;
-    static DbHelperTLog dbHelper;
+    static DbHelper dbHelper;
     static SQLiteDatabase db;
 
     public static void init(Context context1) {
         context = context1;
-        dbHelper = new DbHelperTLog(context);
+        dbHelper = new DbHelper(context);
+        // Gets the data repository in write mode
         db = dbHelper.getReadableDatabase();
     }
 
     public static long addRule(RuleModel ruleModel) {
-        // Gets the data repository in write mode
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
-        values.put(RuleTable.RuleEntry.COLUMN_NAME_MATCH_ID, ruleModel.getMatchId());
+        values.put(RuleTable.RuleEntry.COLUMN_NAME_FILED, ruleModel.getFiled());
+        values.put(RuleTable.RuleEntry.COLUMN_NAME_CHECK, ruleModel.getCheck());
+        values.put(RuleTable.RuleEntry.COLUMN_NAME_VALUE, ruleModel.getValue());
         values.put(RuleTable.RuleEntry.COLUMN_NAME_SENDER_ID, ruleModel.getSenderId());
-        values.put(RuleTable.RuleEntry.COLUMN_NAME_TIME, ruleModel.getTime());
 
         // Insert the new row, returning the primary key value of the new row
 
         return db.insert(RuleTable.RuleEntry.TABLE_NAME, null, values);
+    }
+
+    public static long updateRule(RuleModel ruleModel) {
+        if(ruleModel==null) return 0;
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(RuleTable.RuleEntry.COLUMN_NAME_FILED, ruleModel.getFiled());
+        values.put(RuleTable.RuleEntry.COLUMN_NAME_CHECK, ruleModel.getCheck());
+        values.put(RuleTable.RuleEntry.COLUMN_NAME_VALUE, ruleModel.getValue());
+        values.put(RuleTable.RuleEntry.COLUMN_NAME_SENDER_ID, ruleModel.getSenderId());
+
+        String selection = RuleTable.RuleEntry._ID + " = ? ";
+        String[] whereArgs = {String.valueOf(ruleModel.getId())};
+
+        return db.update(RuleTable.RuleEntry.TABLE_NAME,  values,selection,whereArgs);
     }
 
     public static int delRule(Long id) {
@@ -58,19 +67,20 @@ public class RuleUtil {
             selectionArgList.add(String.valueOf(id));
 
         }
-
-        String[] selectionArgs = (String[]) selectionArgList.toArray();
+        String[] selectionArgs = selectionArgList.toArray(new String[selectionArgList.size()]);
         // Issue SQL statement.
         return db.delete(RuleTable.RuleEntry.TABLE_NAME, selection, selectionArgs);
 
     }
 
-    public static List<RuleVo> getRule(Long id, Long matchId, Long senderId) {
+    public static List<RuleModel> getRule(Long id,String key) {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
                 BaseColumns._ID,
-                RuleTable.RuleEntry.COLUMN_NAME_MATCH_ID,
+                RuleTable.RuleEntry.COLUMN_NAME_FILED,
+                RuleTable.RuleEntry.COLUMN_NAME_CHECK,
+                RuleTable.RuleEntry.COLUMN_NAME_VALUE,
                 RuleTable.RuleEntry.COLUMN_NAME_SENDER_ID,
                 RuleTable.RuleEntry.COLUMN_NAME_TIME
         };
@@ -85,21 +95,13 @@ public class RuleUtil {
             selectionArgList.add(String.valueOf(id));
         }
 
-        if(matchId!=null){
+        if(key!=null){
             // Define 'where' part of query.
-            selection =" and " +  RuleTable.RuleEntry.COLUMN_NAME_MATCH_ID + " = ? ";
+            selection =" and (" +  RuleTable.RuleEntry.COLUMN_NAME_VALUE + " LIKE ? ";
             // Specify arguments in placeholder order.
-            selectionArgList.add(String.valueOf(matchId));
+            selectionArgList.add(key);
         }
-
-        if(senderId!=null){
-            // Define 'where' part of query.
-            selection =" and " +  RuleTable.RuleEntry.COLUMN_NAME_SENDER_ID + " = ? ";
-            // Specify arguments in placeholder order.
-            selectionArgList.add(String.valueOf(senderId));
-        }
-
-        String[] selectionArgs = (String[]) selectionArgList.toArray();
+        String[] selectionArgs = selectionArgList.toArray(new String[selectionArgList.size()]);
 
         // How you want the results sorted in the resulting Cursor
         String sortOrder =
@@ -114,15 +116,34 @@ public class RuleUtil {
                 null,                   // don't filter by row groups
                 sortOrder               // The sort order
         );
-//        List<LogModel> tLogs = new ArrayList<>();
-        List<RuleVo> ruleVos = new ArrayList<>();
+        List<RuleModel> tRules = new ArrayList<>();
         while(cursor.moveToNext()) {
+
             long itemId = cursor.getLong(
                     cursor.getColumnIndexOrThrow(RuleTable.RuleEntry._ID));
-//            tLogs.add(itemId);
+            String itemFiled = cursor.getString(
+                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.COLUMN_NAME_FILED));
+            String itemCheck = cursor.getString(
+                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.COLUMN_NAME_CHECK));
+            String itemValue = cursor.getString(
+                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.COLUMN_NAME_VALUE));
+            long itemSenderId = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.COLUMN_NAME_SENDER_ID));
+            long itemTime = cursor.getLong(
+                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.COLUMN_NAME_TIME));
+
+            RuleModel ruleModel = new RuleModel();
+            ruleModel.setId(itemId);
+            ruleModel.setFiled(itemFiled);
+            ruleModel.setCheck(itemCheck);
+            ruleModel.setValue(itemValue);
+            ruleModel.setSenderId(itemSenderId);
+            ruleModel.setTime(itemTime);
+
+            tRules.add(ruleModel);
         }
         cursor.close();
-        return ruleVos;
+        return tRules;
     }
 
 }

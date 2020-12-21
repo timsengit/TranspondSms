@@ -1,4 +1,4 @@
-package com.tim.tsms.transpondsms.model;
+package com.tim.tsms.transpondsms.model.vo;
 
 public class RuleVo {
     private String matchStr;

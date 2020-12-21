@@ -19,12 +19,12 @@ import java.util.Set;
 public class SendHistory {
     static String TAG = "SendHistory";
     static Context context;
-    static DbHelperTLog dbHelper;
+    static DbHelper dbHelper;
     static SQLiteDatabase db;
 
     public static void init(Context context1) {
         context = context1;
-        dbHelper = new DbHelperTLog(context);
+        dbHelper = new DbHelper(context);
         db = dbHelper.getReadableDatabase();
 
     }
@@ -93,7 +93,7 @@ public class SendHistory {
             selectionArgList.add(key);
             selectionArgList.add(key);
         }
-        String[] selectionArgs = (String[]) selectionArgList.toArray();
+        String[] selectionArgs = selectionArgList.toArray(new String[selectionArgList.size()]);
         // Issue SQL statement.
         return db.delete(LogTable.LogEntry.TABLE_NAME, selection, selectionArgs);
 
@@ -126,7 +126,7 @@ public class SendHistory {
             selectionArgList.add(key);
             selectionArgList.add(key);
         }
-        String[] selectionArgs = (String[]) selectionArgList.toArray();
+        String[] selectionArgs = selectionArgList.toArray(new String[selectionArgList.size()]);
 
         // How you want the results sorted in the resulting Cursor
         String sortOrder =
