@@ -89,6 +89,10 @@ public class RuleModel {
         return "当 "+FILED_MAP.get(filed)+" "+CHECK_MAP.get(check)+" "+value+" 转发到 ";
     }
 
+    public static String getRuleMatch(String filed,String check,String value) {
+        return "当 "+FILED_MAP.get(filed)+" "+CHECK_MAP.get(check)+" "+value;
+    }
+
     public Long getRuleSenderId() {
         return senderId;
     }

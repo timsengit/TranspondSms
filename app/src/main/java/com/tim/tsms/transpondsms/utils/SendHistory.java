@@ -141,7 +141,6 @@ public class SendHistory {
                 null,                   // don't filter by row groups
                 sortOrder               // The sort order
         );
-//        List<LogModel> tLogs = new ArrayList<>();
         List<Long> tLogs = new ArrayList<>();
         while(cursor.moveToNext()) {
             long itemId = cursor.getLong(

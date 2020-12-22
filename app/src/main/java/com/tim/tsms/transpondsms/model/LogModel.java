@@ -3,12 +3,13 @@ package com.tim.tsms.transpondsms.model;
 public class LogModel {
     private String from;
     private String content;
+    private Long ruleId;
     private Long time;
 
-    public LogModel(String from, String content, Long time) {
+    public LogModel(String from, String content,Long ruleId) {
         this.from = from;
         this.content = content;
-        this.time = time;
+        this.ruleId = ruleId;
     }
 
     public String getFrom() {
@@ -25,6 +26,14 @@ public class LogModel {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Long getRuleId() {
+        return ruleId;
+    }
+
+    public void setRuleId(Long ruleId) {
+        this.ruleId = ruleId;
     }
 
     public Long getTime() {

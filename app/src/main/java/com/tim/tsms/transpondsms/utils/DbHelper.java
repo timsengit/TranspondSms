@@ -24,6 +24,7 @@ public class DbHelper extends SQLiteOpenHelper {
                             LogTable.LogEntry._ID + " INTEGER PRIMARY KEY," +
                             LogTable.LogEntry.COLUMN_NAME_FROM + " TEXT," +
                             LogTable.LogEntry.COLUMN_NAME_CONTENT + " TEXT," +
+                            LogTable.LogEntry.COLUMN_NAME_RULE_ID + " INTEGER," +
                             LogTable.LogEntry.COLUMN_NAME_TIME + "  TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP)"
                     , "CREATE TABLE " + RuleTable.RuleEntry.TABLE_NAME + " (" +
                             RuleTable.RuleEntry._ID + " INTEGER PRIMARY KEY," +

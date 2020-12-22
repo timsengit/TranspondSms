@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tim.tsms.transpondsms.adapter.RuleAdapter;
@@ -80,6 +81,7 @@ public class RuleActivity extends AppCompatActivity {
         final RadioGroup radioGroupRuleCheck = (RadioGroup) view1.findViewById(R.id.radioGroupRuleCheck);
         if(ruleModel!=null)radioGroupRuleCheck.check(ruleModel.getRuleCheckCheckId());
         
+        final TextView radioGroupRuleSenderTv = (TextView) view1.findViewById(R.id.radioGroupRuleSenderTv);
         final RadioGroup radioGroupRuleSender = (RadioGroup) view1.findViewById(R.id.radioGroupRuleSender);
 
         List<SenderModel> senderModels =SenderUtil.getSender(null,null);
@@ -93,6 +95,9 @@ public class RuleActivity extends AppCompatActivity {
                 tempButton.setChecked(true);
             }
             radioGroupRuleSender.addView(tempButton);
+        }
+        if(senderModels.isEmpty()){
+            radioGroupRuleSenderTv.setText("请先在发送方页面添加发送方");
         }
 
 

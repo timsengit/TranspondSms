@@ -26,7 +26,7 @@
             android:layout_weight="1"
             android:layout_margin="10dp"
             android:background="@android:color/holo_blue_dark"
-            android:onClick="showMsg"
+            android:onClick="refreshLog"
             android:text="刷新记录"
             tools:ignore="NestedWeights" />
         <Button

@@ -19,6 +19,11 @@ import android.widget.Toast;
 
 import com.tim.tsms.transpondsms.BroadCastReceiver.TSMSBroadcastReceiver;
 import com.tim.tsms.transpondsms.adapter.LogAdapter;
+import com.tim.tsms.transpondsms.adapter.RuleAdapter;
+import com.tim.tsms.transpondsms.model.LogModel;
+import com.tim.tsms.transpondsms.model.vo.LogVo;
+import com.tim.tsms.transpondsms.utils.LogUtil;
+import com.tim.tsms.transpondsms.utils.RuleUtil;
 import com.tim.tsms.transpondsms.utils.SendHistory;
 import com.tim.tsms.transpondsms.utils.SendUtil;
 import com.tim.tsms.transpondsms.utils.UpdateAppHttpUtil;
@@ -27,6 +32,7 @@ import com.umeng.analytics.MobclickAgent;
 import com.vector.update_app.UpdateAppManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,17 +40,19 @@ public class MainActivity extends AppCompatActivity {
     private IntentFilter intentFilter;
     private TSMSBroadcastReceiver smsBroadcastReceiver;
     private String TAG = "MainActivity";
-    // logModelList用于存储数据
-    private List<LogModel> logModels =new ArrayList<>();
+    // logVoList用于存储数据
+    private List<LogVo> logVos =new ArrayList<>();
+    private LogAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG,"oncreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        LogUtil.init(this);
         // 先拿到数据并放在适配器上
         initTLogs(); //初始化数据
-        LogAdapter adapter=new LogAdapter(MainActivity.this,R.layout.tlog_item, logModels);
+        adapter=new LogAdapter(MainActivity.this,R.layout.tlog_item, logVos);
 
         // 将适配器上的数据传递给listView
         ListView listView=findViewById(R.id.list_view_log);
@@ -55,8 +63,8 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                LogModel logModel= logModels.get(position);
-                Toast.makeText(MainActivity.this,logModel.getName(),Toast.LENGTH_SHORT).show();
+                LogVo logVo= logVos.get(position);
+//                Toast.makeText(MainActivity.this,logVo.getName(),Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -74,16 +82,7 @@ public class MainActivity extends AppCompatActivity {
     }
     // 初始化数据
     private void initTLogs(){
-        for(int i=0;i<10;i++){
-            LogModel a=new LogModel("a",R.drawable.ic_launcher_background);
-            logModels.add(a);
-            LogModel b=new LogModel("B",R.drawable.ic_launcher_background);
-            logModels.add(b);
-            LogModel c=new LogModel("C",R.drawable.ic_launcher_background);
-            logModels.add(c);
-            LogModel d=new LogModel("D",R.drawable.ic_launcher_background);
-            logModels.add(d);
-        }
+        logVos= LogUtil.getLog(null,null);
     }
     @Override
     protected void onDestroy() {
@@ -110,10 +109,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void showMsg(View view){
-        Log.d(TAG,"showMsg");
-        String showMsg =SendHistory.getHistory();
-//        textv_msg.setText(showMsg);
+    public void refreshLog(View view){
+        Log.d(TAG,"refreshLog");
+        LogModel newModel=new LogModel("199999","content", 1l);
+        LogUtil.addLog(newModel);
+        initTLogs();
+        adapter.add(logVos);
     }
     
     //按返回键不退出回到桌面

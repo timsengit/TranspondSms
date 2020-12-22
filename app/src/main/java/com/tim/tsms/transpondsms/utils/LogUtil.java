@@ -10,6 +10,11 @@ import android.util.Log;
 
 import com.tim.tsms.transpondsms.model.LogModel;
 import com.tim.tsms.transpondsms.model.LogTable;
+import com.tim.tsms.transpondsms.model.RuleModel;
+import com.tim.tsms.transpondsms.model.RuleTable;
+import com.tim.tsms.transpondsms.model.SenderModel;
+import com.tim.tsms.transpondsms.model.SenderTable;
+import com.tim.tsms.transpondsms.model.vo.LogVo;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -69,14 +74,18 @@ public class LogUtil {
 
     }
 
-    public static String getLog(Long id,String key) {
+    public static List<LogVo> getLog(Long id, String key) {
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
-                BaseColumns._ID,
-                LogTable.LogEntry.COLUMN_NAME_FROM,
-                LogTable.LogEntry.COLUMN_NAME_CONTENT,
-                LogTable.LogEntry.COLUMN_NAME_TIME
+                LogTable.LogEntry.TABLE_NAME+"."+BaseColumns._ID,
+                LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_FROM,
+                LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_CONTENT,
+                RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_FILED,
+                RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_CHECK,
+                RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_VALUE,
+                SenderTable.SenderEntry.TABLE_NAME+"."+SenderTable.SenderEntry.COLUMN_NAME_NAME,
+                SenderTable.SenderEntry.TABLE_NAME+"."+SenderTable.SenderEntry.COLUMN_NAME_TYPE
         };
         // Define 'where' part of query.
         String selection = " 1 ";
@@ -84,14 +93,14 @@ public class LogUtil {
         List<String> selectionArgList = new ArrayList<>();
         if(id!=null){
             // Define 'where' part of query.
-            selection +=" and " + LogTable.LogEntry._ID + " = ? ";
+            selection +=" and " + LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry._ID + " = ? ";
             // Specify arguments in placeholder order.
             selectionArgList.add(String.valueOf(id));
         }
 
         if(key!=null){
             // Define 'where' part of query.
-            selection =" and (" +  LogTable.LogEntry.COLUMN_NAME_FROM + " LIKE ? or "+ LogTable.LogEntry.COLUMN_NAME_CONTENT + " LIKE ? ) ";
+            selection =" and (" +  LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_FROM + " LIKE ? or "+ LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_CONTENT + " LIKE ? ) ";
             // Specify arguments in placeholder order.
             selectionArgList.add(key);
             selectionArgList.add(key);
@@ -100,10 +109,13 @@ public class LogUtil {
 
         // How you want the results sorted in the resulting Cursor
         String sortOrder =
-                LogTable.LogEntry._ID + " DESC";
+                LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry._ID + " DESC";
 
         Cursor cursor = db.query(
-                LogTable.LogEntry.TABLE_NAME,   // The table to query
+                // The table to query
+                LogTable.LogEntry.TABLE_NAME
+                        +" LEFT JOIN "+RuleTable.RuleEntry.TABLE_NAME+" ON "+LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_RULE_ID+"="+RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry._ID
+                        +" LEFT JOIN "+ SenderTable.SenderEntry.TABLE_NAME+" ON "+SenderTable.SenderEntry.TABLE_NAME+"."+SenderTable.SenderEntry._ID+"="+RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_SENDER_ID,
                 projection,             // The array of columns to return (pass null to get all)
                 selection,              // The columns for the WHERE clause
                 selectionArgs,          // The values for the WHERE clause
@@ -111,26 +123,32 @@ public class LogUtil {
                 null,                   // don't filter by row groups
                 sortOrder               // The sort order
         );
-//        List<LogModel> tLogs = new ArrayList<>();
-        List<Long> tLogs = new ArrayList<>();
+        List<LogVo> LogVos = new ArrayList<>();
         while(cursor.moveToNext()) {
-            long itemId = cursor.getLong(
-                    cursor.getColumnIndexOrThrow(LogTable.LogEntry._ID));
-            tLogs.add(itemId);
+
+            String itemfrom = cursor.getString(
+                    cursor.getColumnIndexOrThrow(LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_FROM));
+            String content = cursor.getString(
+                    cursor.getColumnIndexOrThrow(LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_CONTENT));
+            String ruleFiled = cursor.getString(
+                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_FILED));
+            String ruleCheck = cursor.getString(
+                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_CHECK));
+            String ruleValue = cursor.getString(
+                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_VALUE));
+            String senderName = cursor.getString(
+                    cursor.getColumnIndexOrThrow(SenderTable.SenderEntry.TABLE_NAME+"."+SenderTable.SenderEntry.COLUMN_NAME_NAME));
+            Integer senderType = cursor.getInt(
+                    cursor.getColumnIndexOrThrow(SenderTable.SenderEntry.TABLE_NAME+"."+SenderTable.SenderEntry.COLUMN_NAME_TYPE));
+
+            String rule = RuleModel.getRuleMatch(ruleFiled,ruleCheck,ruleValue)+" 转发到 "+senderName;
+            int senderImageId = SenderModel.getImageId(senderType);
+            LogVo logVo = new LogVo(itemfrom,content,rule,senderImageId);
+
+            LogVos.add(logVo);
         }
         cursor.close();
-
-
-
-        SharedPreferences sp = context.getSharedPreferences(Define.SP_MSG, Context.MODE_PRIVATE);
-        Set<String> msg_set = new HashSet<>();
-        msg_set = sp.getStringSet(Define.SP_MSG_SET_KEY, msg_set);
-        Log.d(TAG, "msg_set.toString()" + msg_set.toString());
-        String getMsg = "";
-        for (String str : msg_set) {
-            getMsg += str + "\n";
-        }
-        return getMsg;
+        return LogVos;
     }
 
 }

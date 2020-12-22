@@ -83,6 +83,18 @@ public class SenderModel {
         }
     }
 
+    public static int getImageId(int type) {
+        switch (type){
+            case (TYPE_DINGDING):
+                return R.mipmap.dingding;
+            case (TYPE_EMAIL):
+                return R.drawable.ic_baseline_email_24;
+            default:
+                return R.mipmap.ic_launcher_round;
+
+        }
+    }
+
     public void setTime(long time) {
         this.time = time;
     }
