@@ -73,24 +73,6 @@
 
         <LinearLayout
             android:gravity="center_vertical"
-            android:id="@+id/about"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:background="@android:color/white"
-            android:orientation="horizontal"
-            android:padding="20dp">
-
-            <TextView
-                android:layout_weight="3"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="LinkHelper" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:gravity="center_vertical"
             android:id="@+id/about_web"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -112,7 +94,7 @@
                 android:layout_weight="3"
                 android:gravity="right"
                 android:autoLink="web"
-                android:text="linkhelper.allmything.com"
+                android:text="tsms.allmything.com"
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -141,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="right"
                 android:textIsSelectable="true"
-                android:text="706160983" />
+                android:text="793283514" />
 
         </LinearLayout>
 
