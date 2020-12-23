@@ -1,8 +1,10 @@
 package com.tim.tsms.transpondsms;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -32,6 +34,10 @@ public class RuleActivity extends AppCompatActivity {
     // 用于存储数据
     private List<RuleModel> ruleModels = new ArrayList<>();
     private RuleAdapter adapter;
+    public static final int  REQUEST_CODE=1001;
+    private Long  selectSenderId=0l;
+    private String  selectSenderName="";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "oncreate");
@@ -82,31 +88,16 @@ public class RuleActivity extends AppCompatActivity {
         if(ruleModel!=null)radioGroupRuleCheck.check(ruleModel.getRuleCheckCheckId());
         
         final TextView radioGroupRuleSenderTv = (TextView) view1.findViewById(R.id.radioGroupRuleSenderTv);
-        final RadioGroup radioGroupRuleSender = (RadioGroup) view1.findViewById(R.id.radioGroupRuleSender);
-
-        List<SenderModel> senderModels =SenderUtil.getSender(null,null);
-        for (SenderModel senderModel:senderModels
-             ) {
-            RadioButton tempButton = new RadioButton(this);
-            tempButton.setText(senderModel.getName());
-            tempButton.setTag(senderModel.getId());
-            if(ruleModel!=null && ruleModel.getSenderId().equals(senderModel.getId())){
-                Log.d(TAG, "setRule: "+ruleModel.getSenderId());
-                tempButton.setChecked(true);
+        final Button btSetRuleSender = (Button) view1.findViewById(R.id.btSetRuleSender);
+        btSetRuleSender.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(RuleActivity.this,"ttt",Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(RuleActivity.this, SenderActivity.class);
+                intent.putExtra("setSender",true);
+                startActivityForResult(intent,REQUEST_CODE);
             }
-            radioGroupRuleSender.addView(tempButton);
-        }
-        for (int i=0;i<10;i++
-             ) {
-            RadioButton tempButton = new RadioButton(this);
-            tempButton.setText("aaa"+i);
-            radioGroupRuleSender.addView(tempButton);
-        }
-
-        if(senderModels.isEmpty()){
-            radioGroupRuleSenderTv.setText("请先在发送方页面添加发送方");
-        }
-
+        });
 
         final EditText editTextRuleValue = view1.findViewById(R.id.editTextRuleValue);
         if (ruleModel != null)
@@ -122,7 +113,8 @@ public class RuleActivity extends AppCompatActivity {
         buttonruleok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Object senderId = ((RadioButton) view1.findViewById(radioGroupRuleSender.getCheckedRadioButtonId())).getTag();
+//                Object senderId = ((RadioButton) view1.findViewById(radioGroupRuleSender.getCheckedRadioButtonId())).getTag();
+                Object senderId = 1;
                 if (ruleModel == null) {
                     RuleModel newRuleModel = new RuleModel();
                     newRuleModel.setFiled(RuleModel.getRuleFiledFromCheckId(radioGroupRuleFiled.getCheckedRadioButtonId()));
@@ -159,7 +151,15 @@ public class RuleActivity extends AppCompatActivity {
             }
         });
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.i(TAG, "MainActivity onActivityResult");
+        if (requestCode==REQUEST_CODE&&resultCode==RESULT_OK){
+            selectSenderId=data.getLongExtra("selectSenderId",0);
+            selectSenderName=data.getStringExtra("selectSenderName");
+            Log.i(TAG, "onActivityResult: selectSenderId="+selectSenderId+"selectSenderName"+selectSenderName);
+        }
+    }
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
