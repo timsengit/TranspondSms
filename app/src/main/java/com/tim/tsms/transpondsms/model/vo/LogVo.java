@@ -5,11 +5,12 @@ public class LogVo {
     private String content;
     private String rule;
     private int senderImageId;
-    private Long time;
+    private String time;
 
-    public LogVo(String from, String content, String rule,int senderImageId) {
+    public LogVo(String from, String content, String time, String rule,int senderImageId) {
         this.from = from;
         this.content = content;
+        this.time = time;
         this.rule = rule;
         this.senderImageId = senderImageId;
     }
@@ -42,7 +43,7 @@ public class LogVo {
         this.rule = rule;
     }
 
-    public Long getTime() {
+    public String getTime() {
         return time;
     }
 

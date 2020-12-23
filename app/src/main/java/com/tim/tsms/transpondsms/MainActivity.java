@@ -1,11 +1,14 @@
 package com.tim.tsms.transpondsms;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -31,11 +34,16 @@ import com.tim.tsms.transpondsms.utils.aUtil;
 import com.umeng.analytics.MobclickAgent;
 import com.vector.update_app.UpdateAppManager;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_DINGDING;
+import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_EMAIL;
+
+public class MainActivity extends AppCompatActivity implements ReFlashListView.IReflashListener {
 
     private IntentFilter intentFilter;
     private TSMSBroadcastReceiver smsBroadcastReceiver;
@@ -43,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     // logVoList用于存储数据
     private List<LogVo> logVos =new ArrayList<>();
     private LogAdapter adapter;
+    private ReFlashListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,19 +61,16 @@ public class MainActivity extends AppCompatActivity {
         LogUtil.init(this);
         // 先拿到数据并放在适配器上
         initTLogs(); //初始化数据
-        adapter=new LogAdapter(MainActivity.this,R.layout.tlog_item, logVos);
-
-        // 将适配器上的数据传递给listView
-        ListView listView=findViewById(R.id.list_view_log);
-        listView.setAdapter(adapter);
+        showList(logVos);
 
         // 为ListView注册一个监听器，当用户点击了ListView中的任何一个子项时，就会回调onItemClick()方法
         // 在这个方法中可以通过position参数判断出用户点击的是那一个子项
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                LogVo logVo= logVos.get(position);
-//                Toast.makeText(MainActivity.this,logVo.getName(),Toast.LENGTH_SHORT).show();
+                LogVo logVo= logVos.get(position-1);
+                logDetail(logVo);
+//                Toast.makeText(MainActivity.this,String.valueOf(position),Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -80,10 +86,44 @@ public class MainActivity extends AppCompatActivity {
 //        //动态注册广播
 //        registerReceiver(smsBroadcastReceiver, intentFilter);
     }
+
     // 初始化数据
     private void initTLogs(){
         logVos= LogUtil.getLog(null,null);
     }
+
+    private void showList(List<LogVo> logVosN) {
+        Log.d(TAG, "showList: "+logVosN);
+        if (adapter == null) {
+            // 将适配器上的数据传递给listView
+            listView=findViewById(R.id.list_view_log);
+            listView.setInterface(this);
+            adapter=new LogAdapter(MainActivity.this,R.layout.tlog_item, logVosN);
+
+            listView.setAdapter(adapter);
+        } else {
+            adapter.onDateChange(logVosN);
+        }
+    }
+
+    @Override
+    public void onReflash() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                //获取最新数据
+                initTLogs();
+                //通知界面显示
+                showList(logVos);
+                //通知listview 刷新数据完毕；
+                listView.reflashComplete();
+            }
+        }, 2000);
+    }
+
     @Override
     protected void onDestroy() {
         Log.d(TAG,"onDestroy");
@@ -92,7 +132,12 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(smsBroadcastReceiver);
     }
 
-
+    public void logDetail(LogVo logVo) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("详情");
+        builder.setMessage(logVo.getFrom()+"\n"+logVo.getContent()+"\n"+logVo.getRule()+"\n"+logVo.getTime());
+        builder.show();
+    }
 
     public void toSetting(){
         Intent intent = new Intent(this, SettingActivity.class);
@@ -109,14 +154,20 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void refreshLog(View view){
-        Log.d(TAG,"refreshLog");
-        LogModel newModel=new LogModel("199999","content", 1l);
-        LogUtil.addLog(newModel);
+    public void cleanLog(View view){
+        LogUtil.delLog(null,null);
         initTLogs();
         adapter.add(logVos);
     }
-    
+
+    public void addLog(View view){
+        Log.d(TAG,"refreshLog");
+        LogModel newModel=new LogModel("199999","content"+(new SimpleDateFormat("YYYY-MM-dd HH:mm:ss").format(new Date())), 1l);
+        LogUtil.addLog(newModel);
+//        initTLogs();
+//        adapter.add(logVos);
+    }
+
     //按返回键不退出回到桌面
     @Override
     public void onBackPressed() {

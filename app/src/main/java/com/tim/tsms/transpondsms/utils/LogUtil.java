@@ -16,7 +16,10 @@ import com.tim.tsms.transpondsms.model.SenderModel;
 import com.tim.tsms.transpondsms.model.SenderTable;
 import com.tim.tsms.transpondsms.model.vo.LogVo;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +45,7 @@ public class LogUtil {
         ContentValues values = new ContentValues();
         values.put(LogTable.LogEntry.COLUMN_NAME_FROM, logModel.getFrom());
         values.put(LogTable.LogEntry.COLUMN_NAME_CONTENT, logModel.getContent());
+        values.put(LogTable.LogEntry.COLUMN_NAME_RULE_ID, logModel.getRuleId());
 
         // Insert the new row, returning the primary key value of the new row
 
@@ -80,6 +84,7 @@ public class LogUtil {
         String[] projection = {
                 LogTable.LogEntry.TABLE_NAME+"."+BaseColumns._ID,
                 LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_FROM,
+                LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_TIME,
                 LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_CONTENT,
                 RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_FILED,
                 RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_CHECK,
@@ -123,31 +128,47 @@ public class LogUtil {
                 null,                   // don't filter by row groups
                 sortOrder               // The sort order
         );
+
+
+        Log.d(TAG, "getLog: "+db.getPath());
         List<LogVo> LogVos = new ArrayList<>();
+
+        Log.d(TAG, "getLog: itemId cursor"+ Arrays.toString(cursor.getColumnNames()));
         while(cursor.moveToNext()) {
+            try {
+                String itemfrom = cursor.getString(
+                        cursor.getColumnIndexOrThrow(LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_FROM));
+                String content = cursor.getString(
+                        cursor.getColumnIndexOrThrow(LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_CONTENT));
+                String time = cursor.getString(
+                        cursor.getColumnIndexOrThrow(LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_TIME));
+                String ruleFiled = cursor.getString(
+                        cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_FILED));
+                String ruleCheck = cursor.getString(
+                        cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_CHECK));
+                String ruleValue = cursor.getString(
+                        cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_VALUE));
+                String senderName = cursor.getString(
+                        cursor.getColumnIndexOrThrow(SenderTable.SenderEntry.TABLE_NAME+"."+SenderTable.SenderEntry.COLUMN_NAME_NAME));
+                Integer senderType = cursor.getInt(
+                        cursor.getColumnIndexOrThrow(SenderTable.SenderEntry.TABLE_NAME+"."+SenderTable.SenderEntry.COLUMN_NAME_TYPE));
 
-            String itemfrom = cursor.getString(
-                    cursor.getColumnIndexOrThrow(LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_FROM));
-            String content = cursor.getString(
-                    cursor.getColumnIndexOrThrow(LogTable.LogEntry.TABLE_NAME+"."+LogTable.LogEntry.COLUMN_NAME_CONTENT));
-            String ruleFiled = cursor.getString(
-                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_FILED));
-            String ruleCheck = cursor.getString(
-                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_CHECK));
-            String ruleValue = cursor.getString(
-                    cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.TABLE_NAME+"."+RuleTable.RuleEntry.COLUMN_NAME_VALUE));
-            String senderName = cursor.getString(
-                    cursor.getColumnIndexOrThrow(SenderTable.SenderEntry.TABLE_NAME+"."+SenderTable.SenderEntry.COLUMN_NAME_NAME));
-            Integer senderType = cursor.getInt(
-                    cursor.getColumnIndexOrThrow(SenderTable.SenderEntry.TABLE_NAME+"."+SenderTable.SenderEntry.COLUMN_NAME_TYPE));
+                Log.d(TAG, "getLog: time"+time);
+                String rule = RuleModel.getRuleMatch(ruleFiled,ruleCheck,ruleValue)+" 转发到 "+senderName;
+//                String rule = time+" 转发到 "+senderName;
+                int senderImageId = SenderModel.getImageId(senderType);
+                LogVo logVo = new LogVo(itemfrom,content,time,rule,senderImageId);
 
-            String rule = RuleModel.getRuleMatch(ruleFiled,ruleCheck,ruleValue)+" 转发到 "+senderName;
-            int senderImageId = SenderModel.getImageId(senderType);
-            LogVo logVo = new LogVo(itemfrom,content,rule,senderImageId);
+                LogVos.add(logVo);
+            }catch (Exception e){
+                Log.i(TAG, "getLog e:"+e.getMessage());
+            }
 
-            LogVos.add(logVo);
         }
+
+
         cursor.close();
+
         return LogVos;
     }
 

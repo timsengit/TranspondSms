@@ -96,10 +96,16 @@ public class RuleActivity extends AppCompatActivity {
             }
             radioGroupRuleSender.addView(tempButton);
         }
+        for (int i=0;i<10;i++
+             ) {
+            RadioButton tempButton = new RadioButton(this);
+            tempButton.setText("aaa"+i);
+            radioGroupRuleSender.addView(tempButton);
+        }
+
         if(senderModels.isEmpty()){
             radioGroupRuleSenderTv.setText("请先在发送方页面添加发送方");
         }
-
 
 
         final EditText editTextRuleValue = view1.findViewById(R.id.editTextRuleValue);
@@ -109,8 +115,7 @@ public class RuleActivity extends AppCompatActivity {
         Button buttonruleok = view1.findViewById(R.id.buttonruleok);
         Button buttonruledel = view1.findViewById(R.id.buttonruledel);
         alertDialog71
-                .setTitle(R.string.setdingdingtitle)
-                .setIcon(R.mipmap.dingding)
+                .setTitle(R.string.setrule)
                 .setView(view1)
                 .create();
         final AlertDialog show = alertDialog71.show();

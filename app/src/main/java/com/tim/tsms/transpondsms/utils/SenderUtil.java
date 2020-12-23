@@ -136,6 +136,7 @@ public class SenderUtil {
                     cursor.getColumnIndexOrThrow(SenderTable.SenderEntry.COLUMN_NAME_JSON_SETTING));
             long itemTime = cursor.getLong(
                     cursor.getColumnIndexOrThrow(SenderTable.SenderEntry.COLUMN_NAME_TIME));
+            Log.d(TAG, "getSender: itemId"+itemId);
 
             SenderModel senderModel = new SenderModel();
             senderModel.setId(itemId);
@@ -149,6 +150,41 @@ public class SenderUtil {
         }
         cursor.close();
         return tSenders;
+    }
+
+    public static int countSender(String key) {
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+        };
+        // Define 'where' part of query.
+        String selection = " 1 ";
+        // Specify arguments in placeholder order.
+        List<String> selectionArgList = new ArrayList<>();
+
+        if(key!=null){
+            // Define 'where' part of query.
+            selection =" and (" +  SenderTable.SenderEntry.COLUMN_NAME_NAME + " LIKE ? or "+ SenderTable.SenderEntry.COLUMN_NAME_JSON_SETTING + " LIKE ? ) ";
+            // Specify arguments in placeholder order.
+            selectionArgList.add(key);
+            selectionArgList.add(key);
+        }
+        String[] selectionArgs = selectionArgList.toArray(new String[selectionArgList.size()]);
+
+        // How you want the results sorted in the resulting Cursor
+
+        Cursor cursor = db.query(
+                SenderTable.SenderEntry.TABLE_NAME,   // The table to query
+                projection,             // The array of columns to return (pass null to get all)
+                selection,              // The columns for the WHERE clause
+                selectionArgs,          // The values for the WHERE clause
+                null,                   // don't group the rows
+                null,                   // don't filter by row groups
+                null               // The sort order
+        );
+        int count=cursor.getCount();
+        cursor.close();
+        return count;
     }
 
 }

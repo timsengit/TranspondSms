@@ -16,6 +16,8 @@ public class DbHelper extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final String TAG = "DbHelper";
     public static final int DATABASE_VERSION = 1;
+    //debug db
+//    public static final String DATABASE_NAME = "/sdcard/transpondsms.db";
     public static final String DATABASE_NAME = "transpondsms.db";
 
     private static final List<String> SQL_CREATE_ENTRIES =

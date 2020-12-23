@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.tim.tsms.transpondsms.model.RuleModel;
 import com.tim.tsms.transpondsms.model.RuleTable;
@@ -132,6 +133,7 @@ public class RuleUtil {
             long itemTime = cursor.getLong(
                     cursor.getColumnIndexOrThrow(RuleTable.RuleEntry.COLUMN_NAME_TIME));
 
+            Log.d(TAG, "getRule: itemId"+itemId);
             RuleModel ruleModel = new RuleModel();
             ruleModel.setId(itemId);
             ruleModel.setFiled(itemFiled);

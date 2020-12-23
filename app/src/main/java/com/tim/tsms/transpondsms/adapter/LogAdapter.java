@@ -101,5 +101,8 @@ public class LogAdapter extends ArrayAdapter<LogVo> {
             notifyDataSetChanged();
         }
     }
-
+    public void onDateChange(List<LogVo> logVos) {
+        list = logVos;
+        notifyDataSetChanged();
+    }
 }
