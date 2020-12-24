@@ -26,18 +26,26 @@ import java.util.Set;
 
 public class LogUtil {
     static String TAG = "LogUtil";
+    static Boolean hasInit=false;
+
     static Context context;
     static DbHelper dbHelper;
     static SQLiteDatabase db;
 
     public static void init(Context context1) {
-        context = context1;
-        dbHelper = new DbHelper(context);
-        // Gets the data repository in write mode
-        db = dbHelper.getReadableDatabase();
+        synchronized (hasInit){
+            if(hasInit)return;
+            hasInit=true;
+            context = context1;
+            dbHelper = new DbHelper(context);
+            // Gets the data repository in write mode
+            db = dbHelper.getReadableDatabase();
+        }
+
     }
 
     public static long addLog(LogModel logModel) {
+        Log.i(TAG, "addLog logModel: "+logModel);
         //不保存转发消息
         if (logModel==null) return 0;
 

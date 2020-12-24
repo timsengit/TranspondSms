@@ -155,9 +155,21 @@ public class MainActivity extends AppCompatActivity implements ReFlashListView.I
     }
 
     public void cleanLog(View view){
-        LogUtil.delLog(null,null);
-        initTLogs();
-        adapter.add(logVos);
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("确定要清空转发记录吗？")
+        .setPositiveButton("清空", new DialogInterface.OnClickListener() {// 积极
+
+            @Override
+            public void onClick(DialogInterface dialog,
+                                int which) {
+                // TODO Auto-generated method stub
+                LogUtil.delLog(null,null);
+                initTLogs();
+                adapter.add(logVos);
+            }
+        });
+        builder.show();
+
     }
 
     public void addLog(View view){

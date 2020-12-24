@@ -18,14 +18,21 @@ import java.util.Set;
 
 public class SendHistory {
     static String TAG = "SendHistory";
+    static Boolean hasInit=false;
+
     static Context context;
     static DbHelper dbHelper;
     static SQLiteDatabase db;
 
     public static void init(Context context1) {
-        context = context1;
-        dbHelper = new DbHelper(context);
-        db = dbHelper.getReadableDatabase();
+        synchronized (hasInit){
+            if(hasInit)return;
+            hasInit=true;
+            context = context1;
+            dbHelper = new DbHelper(context);
+            db = dbHelper.getReadableDatabase();
+        }
+
 
     }
 

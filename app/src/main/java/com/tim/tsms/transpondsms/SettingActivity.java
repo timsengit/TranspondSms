@@ -1,25 +1,29 @@
 package com.tim.tsms.transpondsms;
 
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.Preference;
-import android.preference.SwitchPreference;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tim.tsms.transpondsms.utils.HttpI;
+import com.tim.tsms.transpondsms.utils.HttpUtil;
 import com.tim.tsms.transpondsms.utils.UpdateAppHttpUtil;
 import com.tim.tsms.transpondsms.utils.aUtil;
 import com.vector.update_app.UpdateAppManager;
 import com.vector.update_app.UpdateCallback;
 import com.vector.update_app.listener.ExceptionHandler;
+
+import java.util.HashMap;
 
 
 public class SettingActivity extends AppCompatActivity {
@@ -110,5 +114,46 @@ public class SettingActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    public void feedbackcommit(View view) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(SettingActivity.this);
+        View view1 = View.inflate(SettingActivity.this, R.layout.dialog_feedback, null);
+
+        final EditText feedback_et_email = view1.findViewById(R.id.feedback_et_email);
+        final EditText feedback_et_text = view1.findViewById(R.id.feedback_et_text);
+
+        builder
+                .setTitle(R.string.feedback_input_text)
+                .setView(view1)
+                .create();
+        builder.setPositiveButton("提交反馈",new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                try {
+                    new HttpUtil().asyncGet("https://www.willanddo.com/up.json", new HashMap<String, String>(), new HttpI.Callback() {
+                        @Override
+                        public void onResponse(String result) {
+                            Toast.makeText(SettingActivity.this,"感谢您的反馈，我们将尽快处理！",Toast.LENGTH_LONG).show();
+
+                        }
+                        @Override
+                        public void onError(String error) {
+                            Toast.makeText(SettingActivity.this,error,Toast.LENGTH_LONG).show();
+
+                        }
+                    });
+
+                }catch (Exception e){
+                    Toast.makeText(SettingActivity.this,e.getMessage(),Toast.LENGTH_LONG).show();
+                    Log.d(TAG,"feedback e: "+e.getMessage());
+                }
+
+
+            }
+        }).show();
+    }
+
+
 
 }

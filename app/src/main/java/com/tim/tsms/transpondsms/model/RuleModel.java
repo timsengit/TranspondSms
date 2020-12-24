@@ -7,10 +7,12 @@ import java.util.Map;
 
 public class RuleModel {
     private Long id;
+    public static final String FILED_TRANSPOND_ALL="transpond_all";
     public static final String FILED_PHONE_NUM="phone_num";
     public static final String FILED_MSG_CONTENT="msg_content";
     public static final Map<String,String> FILED_MAP=new HashMap<String, String>();
     static{
+        FILED_MAP.put("transpond_all", "转发全部");
         FILED_MAP.put("phone_num", "手机号");
         FILED_MAP.put("msg_content", "内容");
     }
@@ -86,11 +88,24 @@ public class RuleModel {
 
 
     public String getRuleMatch() {
-        return "当 "+FILED_MAP.get(filed)+" "+CHECK_MAP.get(check)+" "+value+" 转发到 ";
+        switch (filed){
+            case FILED_TRANSPOND_ALL:
+                return "全部转发到 ";
+            default:
+                return "当 "+FILED_MAP.get(filed)+" "+CHECK_MAP.get(check)+" "+value+" 转发到 ";
+        }
+
     }
 
     public static String getRuleMatch(String filed,String check,String value) {
-        return "当 "+FILED_MAP.get(filed)+" "+CHECK_MAP.get(check)+" "+value;
+        switch (filed){
+            case FILED_TRANSPOND_ALL:
+                return "全部转发到 ";
+            default:
+                return "当 "+FILED_MAP.get(filed)+" "+CHECK_MAP.get(check)+" "+value;
+
+        }
+
     }
 
     public Long getRuleSenderId() {
@@ -101,8 +116,10 @@ public class RuleModel {
         switch (filed){
             case FILED_MSG_CONTENT:
                 return R.id.btnContent;
-            default:
+            case FILED_PHONE_NUM:
                 return R.id.btnPhone;
+            default:
+                return R.id.btnTranspondAll;
         }
     }
 
@@ -110,8 +127,10 @@ public class RuleModel {
         switch (id){
             case R.id.btnContent:
                 return FILED_MSG_CONTENT;
-            default:
+            case R.id.btnPhone:
                 return FILED_PHONE_NUM;
+            default:
+                return FILED_TRANSPOND_ALL;
         }
     }
 
@@ -145,4 +164,15 @@ public class RuleModel {
         }
     }
 
+    @Override
+    public String toString() {
+        return "RuleModel{" +
+                "id=" + id +
+                ", filed='" + filed + '\'' +
+                ", check='" + check + '\'' +
+                ", value='" + value + '\'' +
+                ", senderId=" + senderId +
+                ", time=" + time +
+                '}';
+    }
 }

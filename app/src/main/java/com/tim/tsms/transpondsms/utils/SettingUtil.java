@@ -8,13 +8,17 @@ import android.util.Log;
 public class SettingUtil {
     private static String TAG = "SettingUtil";
 
+    static Boolean hasInit=false;
     private static SharedPreferences sp_setting=null;
     private static Context context=null;
     public static void init(Context context1){
-        if(context==null){
+        synchronized (hasInit){
+            if(hasInit)return;
+            hasInit=true;
             context = context1;
             Log.d(TAG,"init ");
             sp_setting = PreferenceManager.getDefaultSharedPreferences(context1);
+
         }
     }
 

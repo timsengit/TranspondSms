@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.tim.tsms.transpondsms.RuleActivity.REQUEST_CODE;
 import static com.tim.tsms.transpondsms.model.SenderModel.STATUS_ON;
 import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_DINGDING;
 import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_EMAIL;
@@ -68,10 +67,6 @@ public class SenderActivity extends AppCompatActivity {
         ListView listView = findViewById(R.id.list_view_sender);
         listView.setAdapter(adapter);
 
-        //选择发送者
-        Intent intentResult = getIntent();
-        final boolean setSener = intentResult.getBooleanExtra("setSender",false);
-
         // 为ListView注册一个监听器，当用户点击了ListView中的任何一个子项时，就会回调onItemClick()方法
         // 在这个方法中可以通过position参数判断出用户点击的是那一个子项
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -79,14 +74,6 @@ public class SenderActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 SenderModel senderModel = senderModels.get(position);
                 Log.d(TAG, "onItemClick: "+senderModel);
-                if(setSener){
-                    Intent data=new Intent();
-                    data.putExtra("selectSenderId",senderModel.getId());
-                    data.putExtra("selectSenderName",senderModel.getName());
-                    setResult(REQUEST_CODE,data);
-                    finish();
-                }
-
 
                 switch (senderModel.getType()){
                     case TYPE_DINGDING:

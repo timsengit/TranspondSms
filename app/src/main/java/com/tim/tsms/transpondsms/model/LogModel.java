@@ -40,4 +40,13 @@ public class LogModel {
         return time;
     }
 
+    @Override
+    public String toString() {
+        return "LogModel{" +
+                "from='" + from + '\'' +
+                ", content='" + content + '\'' +
+                ", ruleId=" + ruleId +
+                ", time=" + time +
+                '}';
+    }
 }

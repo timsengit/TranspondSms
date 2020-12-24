@@ -102,4 +102,16 @@ public class SenderModel {
     public long getTime() {
         return time;
     }
+
+    @Override
+    public String toString() {
+        return "SenderModel{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                ", type=" + type +
+                ", jsonSetting='" + jsonSetting + '\'' +
+                ", time=" + time +
+                '}';
+    }
 }

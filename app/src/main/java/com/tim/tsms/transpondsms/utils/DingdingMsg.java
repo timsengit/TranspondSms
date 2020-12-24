@@ -79,6 +79,7 @@ public class DingdingMsg {
     }
 
     public static void sendMsg(final boolean handError, String token, String secret, String msg) throws Exception {
+        Log.i(TAG, "sendMsg handError:"+handError+" token:"+token+" secret:"+secret+" msg:"+msg);
 
         if (token == null || token.isEmpty()) {
             return;
@@ -114,6 +115,7 @@ public class DingdingMsg {
                 Log.d(TAG, "onFailure：" + e.getMessage());
 
 //                SendHistory.addHistory("钉钉转发:"+msgf+"onFailure：" + e.getMessage());
+
                 if(handError){
                     android.os.Message msg = new android.os.Message();
                     msg.what = NOTIFY;

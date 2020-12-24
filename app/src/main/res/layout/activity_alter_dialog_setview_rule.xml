@@ -11,29 +11,10 @@
         android:orientation="vertical">
 
         <TextView
-            android:layout_weight="3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="全部转发：开启后不再匹配下方的字段模式值直接使用发送方发送" />
-        <Switch
-            android:id="@+id/trans_all_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:gravity="end"
-            android:textSize="18sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-
-        <TextView
             android:layout_margin="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="设置匹配的字段" />
+            android:text="设置匹配的字段:选择全部转发后不再匹配下方的模式值直接使用发送方发送" />
 
 
         <RadioGroup
@@ -43,11 +24,17 @@
             android:orientation="horizontal">
 
             <RadioButton
+                android:id="@+id/btnTranspondAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="转发全部"
+                android:checked="true"/>
+
+            <RadioButton
                 android:id="@+id/btnPhone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="手机号"
-                android:checked="true"/>
+                android:text="手机号"/>
 
             <RadioButton
                 android:id="@+id/btnContent"
@@ -137,17 +124,18 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/radioGroupRuleSenderTv"
+            android:id="@+id/ruleSenderTv"
             android:layout_margin="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="设置发送方" />
+            android:text="" />
 
 
         <Button
             android:id="@+id/btSetRuleSender"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:text="设置发送方">
 
         </Button>
     </LinearLayout>

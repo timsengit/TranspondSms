@@ -15,15 +15,21 @@ import java.util.List;
 
 public class RuleUtil {
     static String TAG = "RuleUtil";
+    static Boolean hasInit=false;
     static Context context;
     static DbHelper dbHelper;
     static SQLiteDatabase db;
 
     public static void init(Context context1) {
-        context = context1;
-        dbHelper = new DbHelper(context);
-        // Gets the data repository in write mode
-        db = dbHelper.getReadableDatabase();
+        synchronized (hasInit){
+            if(hasInit)return;
+            hasInit=true;
+            context = context1;
+            dbHelper = new DbHelper(context);
+            // Gets the data repository in write mode
+            db = dbHelper.getReadableDatabase();
+        }
+
     }
 
     public static long addRule(RuleModel ruleModel) {
