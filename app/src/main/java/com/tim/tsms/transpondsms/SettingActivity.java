@@ -15,6 +15,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.tim.tsms.transpondsms.utils.HttpI;
 import com.tim.tsms.transpondsms.utils.HttpUtil;
 import com.tim.tsms.transpondsms.utils.UpdateAppHttpUtil;
@@ -23,7 +24,9 @@ import com.vector.update_app.UpdateAppManager;
 import com.vector.update_app.UpdateCallback;
 import com.vector.update_app.listener.ExceptionHandler;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class SettingActivity extends AppCompatActivity {
@@ -131,10 +134,19 @@ public class SettingActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
 
                 try {
-                    new HttpUtil().asyncGet("https://www.willanddo.com/up.json", new HashMap<String, String>(), new HttpI.Callback() {
+                    Map<String,String> feedBackData=new HashMap<>();
+                    feedBackData.put("email",feedback_et_email.getText().toString());
+                    feedBackData.put("text",feedback_et_text.getText().toString());
+                    new HttpUtil().asyncGet("https://api.sl.willanddo.com/api/tsms/feedBack", feedBackData, new HttpI.Callback() {
                         @Override
                         public void onResponse(String result) {
-                            Toast.makeText(SettingActivity.this,"感谢您的反馈，我们将尽快处理！",Toast.LENGTH_LONG).show();
+                            FeedBackResult feedBackResult= JSON.parseObject(result,FeedBackResult.class);
+                            if(feedBackResult!=null){
+                                Toast.makeText(SettingActivity.this,feedBackResult.getMessage(),Toast.LENGTH_LONG).show();
+                            }else {
+                                Toast.makeText(SettingActivity.this,"感谢您的反馈，我们将尽快处理！",Toast.LENGTH_LONG).show();
+
+                            }
 
                         }
                         @Override
@@ -154,6 +166,23 @@ public class SettingActivity extends AppCompatActivity {
         }).show();
     }
 
+    class FeedBackResult implements Serializable {
+        Integer code;
+        String message;
+        Object result;
+
+        public FeedBackResult(){
+
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public boolean isSuccess(){
+            return 1==code;
+        }
+    }
 
 
 }
