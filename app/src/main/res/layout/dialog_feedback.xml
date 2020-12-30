@@ -3,12 +3,6 @@
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:scaleType="center"
-        android:background="#2196F3"
-        android:contentDescription="@string/app_name" />
     <EditText
         android:id="@+id/feedback_et_email"
         android:inputType="textEmailAddress"

@@ -1,16 +1,12 @@
 package com.tim.tsms.transpondsms.utils;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
-
 
 import java.io.IOException;
 import java.net.URLEncoder;
-
-import android.util.Base64;
-import android.widget.Toast;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,17 +14,17 @@ import javax.crypto.spec.SecretKeySpec;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static com.lzy.okgo.utils.HttpUtils.runOnUiThread;
 import static com.tim.tsms.transpondsms.SenderActivity.NOTIFY;
 
-public class DingdingMsg {
+public class SenderWebNotifyMsg {
 
-    static String TAG = "DingdingMsg";
+    static String TAG = "SenderDingdingMsg";
 
     public static void sendMsg(String msg) throws Exception {
 
@@ -78,43 +74,35 @@ public class DingdingMsg {
         });
     }
 
-    public static void sendMsg(final boolean handError, String token, String secret, String msg) throws Exception {
-        Log.i(TAG, "sendMsg handError:"+handError+" token:"+token+" secret:"+secret+" msg:"+msg);
+    public static void sendMsg(final boolean handError, String token, String from, String content) throws Exception {
+        Log.i(TAG, "sendMsg handError:"+handError+" token:"+token+" from:"+from+" content:"+content);
 
         if (token == null || token.isEmpty()) {
             return;
         }
-        if (secret != null && !secret.isEmpty()) {
-            Long timestamp = System.currentTimeMillis();
 
-            String stringToSign = timestamp + "\n" + secret;
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));
-            byte[] signData = mac.doFinal(stringToSign.getBytes("UTF-8"));
-            String sign = URLEncoder.encode(new String(Base64.encode(signData, Base64.NO_WRAP)), "UTF-8");
-            token += "&timestamp=" + timestamp + "&sign=" + sign;
-            Log.i(TAG, "webhook_token:" + token);
 
-        }
 
-        final String msgf = msg;
-        String textMsg = "{ \"msgtype\": \"text\", \"text\": {\"content\": \"" + msg + "\"}}";
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json;charset=utf-8"),
-                textMsg);
 
-        final Request request = new Request.Builder()
-                .url(token)
-                .addHeader("Content-Type", "application/json; charset=utf-8")
-                .post(requestBody)
+        OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                .addFormDataPart("from",from)
+                .addFormDataPart("content",content)
+                .build();
+        Request request = new Request.Builder()
+                .url(token)
+                .method("POST", body)
+                .build();
+//        Response response = client.newCall(request).execute();
+
+
         Call call = client.newCall(request);
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
                 Log.d(TAG, "onFailure：" + e.getMessage());
-
-//                SendHistory.addHistory("钉钉转发:"+msgf+"onFailure：" + e.getMessage());
 
                 if(handError){
                     android.os.Message msg = new android.os.Message();
@@ -124,7 +112,6 @@ public class DingdingMsg {
                     msg.setData(bundle);
                     (new Handler()).sendMessage(msg);
                 }
-
 
             }
 
@@ -143,7 +130,6 @@ public class DingdingMsg {
                     Log.d(TAG, "Coxxyyde：" + String.valueOf(response.code()) + responseStr);
                 }
 
-//                SendHistory.addHistory("钉钉转发:"+msgf+"Code：" + String.valueOf(response.code())+responseStr);
             }
         });
     }

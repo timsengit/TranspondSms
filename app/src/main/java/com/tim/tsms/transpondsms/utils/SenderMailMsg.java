@@ -18,8 +18,8 @@ import javax.mail.internet.MimeMessage;
 import static com.tim.tsms.transpondsms.SenderActivity.NOTIFY;
 
 
-public class SendMailUtil {
-    private static String TAG = "SendMailUtil";
+public class SenderMailMsg {
+    private static String TAG = "SenderMailMsg";
     //qq
 //    private static final String HOST = "smtp.qq.com";
 //    private static final String PORT = "587";
@@ -143,7 +143,7 @@ public class SendMailUtil {
  *             } catch (IOException e) {
  *             }
  *         }
- *         SendMailUtil.send(file,editText.getText().toString());
+ *         SenderMailMsg.send(file,editText.getText().toString());
  *     }
  *
  *

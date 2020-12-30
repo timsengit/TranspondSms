@@ -1,7 +1,6 @@
 package com.tim.tsms.transpondsms;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,9 +19,11 @@ import com.tim.tsms.transpondsms.adapter.SenderAdapter;
 import com.tim.tsms.transpondsms.model.SenderModel;
 import com.tim.tsms.transpondsms.model.vo.DingDingSettingVo;
 import com.tim.tsms.transpondsms.model.vo.EmailSettingVo;
-import com.tim.tsms.transpondsms.utils.DingdingMsg;
-import com.tim.tsms.transpondsms.utils.SendMailUtil;
+import com.tim.tsms.transpondsms.model.vo.WebNotifySettingVo;
+import com.tim.tsms.transpondsms.utils.SenderDingdingMsg;
+import com.tim.tsms.transpondsms.utils.SenderMailMsg;
 import com.tim.tsms.transpondsms.utils.SenderUtil;
+import com.tim.tsms.transpondsms.utils.SenderWebNotifyMsg;
 import com.umeng.analytics.MobclickAgent;
 
 import java.text.SimpleDateFormat;
@@ -33,6 +34,7 @@ import java.util.List;
 import static com.tim.tsms.transpondsms.model.SenderModel.STATUS_ON;
 import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_DINGDING;
 import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_EMAIL;
+import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_WEB_NOTIFY;
 
 public class SenderActivity extends AppCompatActivity {
 
@@ -82,6 +84,9 @@ public class SenderActivity extends AppCompatActivity {
                     case TYPE_EMAIL:
                         setEmail(senderModel);
                         break;
+                    case TYPE_WEB_NOTIFY:
+                        setWebNotify(senderModel);
+                        break;
                     default:
                         Toast.makeText(SenderActivity.this,"异常的发送方类型！删除",Toast.LENGTH_LONG).show();
                         break;
@@ -110,6 +115,9 @@ public class SenderActivity extends AppCompatActivity {
                         break;
                     case TYPE_EMAIL:
                         setEmail(null);
+                        break;
+                    case TYPE_WEB_NOTIFY:
+                        setWebNotify(null);
                         break;
                     default:
                         Toast.makeText(SenderActivity.this, "暂不支持这种转发！", Toast.LENGTH_LONG).show();
@@ -206,7 +214,7 @@ public class SenderActivity extends AppCompatActivity {
                 String secret = editTextDingdingSecret.getText().toString();
                 if (token != null && !token.isEmpty()) {
                     try {
-                        DingdingMsg.sendMsg(true, token, secret, "test@" + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+                        SenderDingdingMsg.sendMsg(true, token, secret, "test@" + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
                     } catch (Exception e) {
                         Toast.makeText(SenderActivity.this, "发送失败：" + e.getMessage(), Toast.LENGTH_LONG).show();
                         e.printStackTrace();
@@ -318,7 +326,97 @@ public class SenderActivity extends AppCompatActivity {
                 String toemail = editTextEmailToAdd.getText().toString();
                 if (!host.isEmpty() && !port.isEmpty() && !fromemail.isEmpty() && !pwd.isEmpty() && !toemail.isEmpty()) {
                     try {
-                        SendMailUtil.sendEmail(true,host,port,fromemail,pwd,toemail,"TranspondSms test", "test@" + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+                        SenderMailMsg.sendEmail(true,host,port,fromemail,pwd,toemail,"TranspondSms test", "test@" + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+                    } catch (Exception e) {
+                        Toast.makeText(SenderActivity.this, "发送失败：" + e.getMessage(), Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+                    }
+                } else {
+                    Toast.makeText(SenderActivity.this, "token 不能为空", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    private void setWebNotify(final SenderModel senderModel) {
+        WebNotifySettingVo webNotifySettingVo = null;
+        //try phrase json setting
+        if (senderModel != null) {
+            String jsonSettingStr = senderModel.getJsonSetting();
+            if (jsonSettingStr != null) {
+                webNotifySettingVo = JSON.parseObject(jsonSettingStr, WebNotifySettingVo.class);
+            }
+        }
+
+        final AlertDialog.Builder alertDialog71 = new AlertDialog.Builder(SenderActivity.this);
+        View view1 = View.inflate(SenderActivity.this, R.layout.activity_alter_dialog_setview_webnotify, null);
+
+        final EditText editTextWebNotifyName = view1.findViewById(R.id.editTextWebNotifyName);
+        if (senderModel != null) editTextWebNotifyName.setText(senderModel.getName());
+        final EditText editTextWebNotifyToken = view1.findViewById(R.id.editTextWebNotifyToken);
+        if (webNotifySettingVo != null) editTextWebNotifyToken.setText(webNotifySettingVo.getToken());
+
+        Button buttonbebnotifyok = view1.findViewById(R.id.buttonbebnotifyok);
+        Button buttonbebnotifydel = view1.findViewById(R.id.buttonbebnotifydel);
+        Button buttonbebnotifytest = view1.findViewById(R.id.buttonbebnotifytest);
+        alertDialog71
+                .setTitle(R.string.setwebnotifytitle)
+                .setIcon(R.mipmap.ic_launcher)
+                .setView(view1)
+                .create();
+        final AlertDialog show = alertDialog71.show();
+
+        buttonbebnotifyok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (senderModel == null) {
+                    SenderModel newSenderModel = new SenderModel();
+                    newSenderModel.setName(editTextWebNotifyName.getText().toString());
+                    newSenderModel.setType(TYPE_WEB_NOTIFY);
+                    newSenderModel.setStatus(STATUS_ON);
+                    WebNotifySettingVo webNotifySettingVoNew = new WebNotifySettingVo(
+                            editTextWebNotifyToken.getText().toString()
+                    );
+                    newSenderModel.setJsonSetting(JSON.toJSONString(webNotifySettingVoNew));
+                    SenderUtil.addSender(newSenderModel);
+                    initSenders();
+                    adapter.add(senderModels);
+                } else {
+                    senderModel.setName(editTextWebNotifyName.getText().toString());
+                    senderModel.setType(TYPE_WEB_NOTIFY);
+                    senderModel.setStatus(STATUS_ON);
+                    WebNotifySettingVo webNotifySettingVoNew = new WebNotifySettingVo(
+                            editTextWebNotifyToken.getText().toString()
+                    );
+                    senderModel.setJsonSetting(JSON.toJSONString(webNotifySettingVoNew));
+                    SenderUtil.updateSender(senderModel);
+                    initSenders();
+                    adapter.update(senderModels);
+                }
+
+                show.dismiss();
+
+            }
+        });
+        buttonbebnotifydel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (senderModel != null) {
+                    SenderUtil.delSender(senderModel.getId());
+                    initSenders();
+                    adapter.del(senderModels);
+                }
+                show.dismiss();
+            }
+        });
+        buttonbebnotifytest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String token = editTextWebNotifyToken.getText().toString();
+                if (!token.isEmpty()) {
+                    try {
+                        SenderWebNotifyMsg.sendMsg(true,token,"TranspondSms test", "test@" + (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
                     } catch (Exception e) {
                         Toast.makeText(SenderActivity.this, "发送失败：" + e.getMessage(), Toast.LENGTH_LONG).show();
                         e.printStackTrace();

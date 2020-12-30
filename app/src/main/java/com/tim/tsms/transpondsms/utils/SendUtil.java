@@ -8,10 +8,10 @@ import com.tim.tsms.transpondsms.model.LogModel;
 import com.tim.tsms.transpondsms.model.RuleModel;
 import com.tim.tsms.transpondsms.model.SenderModel;
 import com.tim.tsms.transpondsms.model.vo.DingDingSettingVo;
+import com.tim.tsms.transpondsms.model.vo.EmailSettingVo;
 import com.tim.tsms.transpondsms.model.vo.SmsVo;
+import com.tim.tsms.transpondsms.model.vo.WebNotifySettingVo;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import static com.tim.tsms.transpondsms.model.RuleModel.CHECK_CONTAIN;
@@ -23,6 +23,8 @@ import static com.tim.tsms.transpondsms.model.RuleModel.FILED_MSG_CONTENT;
 import static com.tim.tsms.transpondsms.model.RuleModel.FILED_PHONE_NUM;
 import static com.tim.tsms.transpondsms.model.RuleModel.FILED_TRANSPOND_ALL;
 import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_DINGDING;
+import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_EMAIL;
+import static com.tim.tsms.transpondsms.model.SenderModel.TYPE_WEB_NOTIFY;
 
 public class SendUtil {
     private static String TAG = "SendUtil";
@@ -30,14 +32,14 @@ public class SendUtil {
     public static void send_msg(String msg){
         if(SettingUtil.using_dingding()){
             try {
-                DingdingMsg.sendMsg(msg);
+                SenderDingdingMsg.sendMsg(msg);
             }catch (Exception e){
                 Log.d(TAG,"发送出错："+e.getMessage());
             }
 
         }
         if(SettingUtil.using_email()){
-//            SendMailUtil.send(SettingUtil.get_send_util_email(Define.SP_MSG_SEND_UTIL_EMAIL_TOADD_KEY),"转发",msg);
+//            SenderMailMsg.send(SettingUtil.get_send_util_email(Define.SP_MSG_SEND_UTIL_EMAIL_TOADD_KEY),"转发",msg);
         }
 
     }
@@ -125,7 +127,7 @@ public class SendUtil {
                 }
                 //规则匹配发现需要发送
                 if(canSend){
-                    List<SenderModel> senderModels = SenderUtil.getSender(ruleModel.getId(),null);
+                    List<SenderModel> senderModels = SenderUtil.getSender(ruleModel.getSenderId(),null);
                     for (SenderModel senderModel:senderModels
                     ) {
                         LogUtil.addLog(new LogModel(smsVo.getMobile(),smsVo.getContent(),senderModel.getId()));
@@ -147,9 +149,40 @@ public class SendUtil {
                     DingDingSettingVo dingDingSettingVo = JSON.parseObject(senderModel.getJsonSetting(), DingDingSettingVo.class);
                     if(dingDingSettingVo!=null){
                         try {
-                            DingdingMsg.sendMsg(false, dingDingSettingVo.getToken(), dingDingSettingVo.getSecret(), smsVo.getSmsVoForSend());
+                            SenderDingdingMsg.sendMsg(false, dingDingSettingVo.getToken(), dingDingSettingVo.getSecret(), smsVo.getSmsVoForSend());
                         }catch (Exception e){
                             Log.e(TAG, "senderSendMsg: dingding error "+e.getMessage() );
+                        }
+
+                    }
+                }
+
+                break;
+            case TYPE_EMAIL:
+                //try phrase json setting
+                if (senderModel.getJsonSetting() != null) {
+                    EmailSettingVo emailSettingVo = JSON.parseObject(senderModel.getJsonSetting(), EmailSettingVo.class);
+                    if(emailSettingVo!=null){
+                        try {
+                            SenderMailMsg.sendEmail(false, emailSettingVo.getHost(),emailSettingVo.getPort(),emailSettingVo.getFromEmail(),
+                                    emailSettingVo.getPwd(),emailSettingVo.getToEmail(),smsVo.getMobile(),smsVo.getSmsVoForSend());
+                        }catch (Exception e){
+                            Log.e(TAG, "senderSendMsg: SenderMailMsg error "+e.getMessage() );
+                        }
+
+                    }
+                }
+
+                break;
+            case TYPE_WEB_NOTIFY:
+                //try phrase json setting
+                if (senderModel.getJsonSetting() != null) {
+                    WebNotifySettingVo webNotifySettingVo = JSON.parseObject(senderModel.getJsonSetting(), WebNotifySettingVo.class);
+                    if(webNotifySettingVo!=null){
+                        try {
+                            SenderWebNotifyMsg.sendMsg(false,webNotifySettingVo.getToken(),smsVo.getMobile(),smsVo.getSmsVoForSend());
+                        }catch (Exception e){
+                            Log.e(TAG, "senderSendMsg: SenderWebNotifyMsg error "+e.getMessage() );
                         }
 
                     }

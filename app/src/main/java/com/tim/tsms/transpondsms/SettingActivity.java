@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSON;
+import com.tim.tsms.transpondsms.model.vo.FeedBackResult;
 import com.tim.tsms.transpondsms.utils.HttpI;
 import com.tim.tsms.transpondsms.utils.HttpUtil;
 import com.tim.tsms.transpondsms.utils.UpdateAppHttpUtil;
@@ -137,12 +138,19 @@ public class SettingActivity extends AppCompatActivity {
                     Map<String,String> feedBackData=new HashMap<>();
                     feedBackData.put("email",feedback_et_email.getText().toString());
                     feedBackData.put("text",feedback_et_text.getText().toString());
-                    new HttpUtil().asyncGet("https://api.sl.willanddo.com/api/tsms/feedBack", feedBackData, new HttpI.Callback() {
+                    new HttpUtil().asyncPost("https://api.sl.willanddo.com/api/tsms/feedBack", feedBackData, new HttpI.Callback() {
                         @Override
                         public void onResponse(String result) {
-                            FeedBackResult feedBackResult= JSON.parseObject(result,FeedBackResult.class);
-                            if(feedBackResult!=null){
-                                Toast.makeText(SettingActivity.this,feedBackResult.getMessage(),Toast.LENGTH_LONG).show();
+                            Log.i(TAG, "onResponse: "+result);
+                            if(result!=null){
+                                FeedBackResult feedBackResult= JSON.parseObject(result, FeedBackResult.class);
+
+                                if(feedBackResult!=null){
+                                    Toast.makeText(SettingActivity.this,feedBackResult.getMessage(),Toast.LENGTH_LONG).show();
+                                }else {
+                                    Toast.makeText(SettingActivity.this,"感谢您的反馈，我们将尽快处理！",Toast.LENGTH_LONG).show();
+
+                                }
                             }else {
                                 Toast.makeText(SettingActivity.this,"感谢您的反馈，我们将尽快处理！",Toast.LENGTH_LONG).show();
 
@@ -151,6 +159,7 @@ public class SettingActivity extends AppCompatActivity {
                         }
                         @Override
                         public void onError(String error) {
+                            Log.i(TAG, "onError: "+error);
                             Toast.makeText(SettingActivity.this,error,Toast.LENGTH_LONG).show();
 
                         }
@@ -165,24 +174,5 @@ public class SettingActivity extends AppCompatActivity {
             }
         }).show();
     }
-
-    class FeedBackResult implements Serializable {
-        Integer code;
-        String message;
-        Object result;
-
-        public FeedBackResult(){
-
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public boolean isSuccess(){
-            return 1==code;
-        }
-    }
-
 
 }

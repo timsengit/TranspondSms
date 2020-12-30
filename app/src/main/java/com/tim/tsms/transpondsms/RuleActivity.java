@@ -84,7 +84,7 @@ public class RuleActivity extends AppCompatActivity {
         
         final TextView ruleSenderTv = (TextView) view1.findViewById(R.id.ruleSenderTv);
         if(ruleModel!=null && ruleModel.getSenderId()!=null){
-            List<SenderModel> getSeners = SenderUtil.getSender(ruleModel.getId(),null);
+            List<SenderModel> getSeners = SenderUtil.getSender(ruleModel.getSenderId(),null);
             if(!getSeners.isEmpty()){
                 ruleSenderTv.setText(getSeners.get(0).getName());
                 ruleSenderTv.setTag(getSeners.get(0).getId());
